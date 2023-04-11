@@ -1,6 +1,9 @@
 library(dplyr)
 library(stringr)
 library(data.table)
+library(ggplot2)
+library(mondate)
+library(zoo)
 #Anil
 #df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
 
@@ -35,3 +38,7 @@ df$contains_str <- NULL
 
 df$Change <- as.numeric(sub("%", "", df$Change, fixed=TRUE))/100
 
+df$quarter <- paste(year(df$Date),quarters(df$Date))
+df_price_quarterly <- df %>% group_by(quarter) %>% summarise(avg = mean(Price))
+
+plot(x = as.yearqtr(df_price_quarterly$quarter, format = '%Y Q%q'), y = df_price_quarterly$avg, type = 'l')
