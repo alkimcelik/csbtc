@@ -1,0 +1,63 @@
+\documentclass{beamer}
+\usetheme{Warsaw}
+%\usecolortheme{beetle}
+\title{Welcome to Beamer}
+\author{You}
+\institute{Where You're From}
+\date{Date of Presentation}
+\usepackage{tikz}
+\begin{document}
+	\begin{frame}
+		\titlepage % beamer's \maketitle
+	\end{frame}
+	\begin{frame}
+		\begin{columns}
+			\begin{column}{0.4\textwidth}
+				\begin{itemize}
+					\item Use the columns ...
+					\item The argument ...
+					\item See also the ...
+				\end{itemize}
+			\end{column}
+			\begin{column}{0.6\textwidth}
+				I should \emph{emphasise} that this is an \alert{important} point.
+				Text in \textbf{bold face}. Text in \textit{italics}.
+				It \textcolor{red}{stops} and \textcolor{green}{starts}.
+			\end{column}
+		\end{columns}
+	\end{frame}
+	\begin{frame}
+		%\begin{figure}
+		%	\includegraphics[
+		%	width=0.5\textwidth]{gerbil}
+		%\end{figure}
+		\begin{tabular}{lrr}
+			Item & Qty & Unit \$ \\
+			Widget & 1 & 199.99 \\
+			Gadget & 2 & 399.99 \\
+			Cable & 3 & 19.99 \\
+		\end{tabular}
+		\begin{tabular}{|l|r|r|} \hline
+			Item & Qty & Unit \$ \\\hline
+			Widget & 1 & 199.99 \\
+			Gadget & 2 & 399.99 \\
+			Cable & 3 & 19.99 \\\hline
+		\end{tabular}
+	\end{frame}
+	\begin{frame}
+		\begin{block}{Interesting Fact}
+			This is important.
+		\end{block}
+		\begin{alertblock}{Cautionary Tale}
+			This is really important!
+		\end{alertblock}
+	\end{frame}
+	%\begin{frame}
+		\begin{tikzpicture}
+			\draw (0,0) -- (1,1); % a line
+		\end{tikzpicture}
+	%\end{frame}
+	\begin{tikzpicture}
+		\draw[help lines] (0,0) grid (3,3);
+	\end{tikzpicture}
+\end{document}
