@@ -14,49 +14,84 @@ Deniz \textbf{Uygur}}
 	\begin{frame}
 		\titlepage % beamer's \maketitle
 	\end{frame}
-	\section{newSection}
+	\section{Introduction}
 	\begin{frame}
-		\frametitle{Presentations with beamer: Frames}
+		\frametitle{Introduction}
 		\begin{itemize}
-			\item Use \texttt{frametitle} to give the frame a title.
-			\item Then add content to the frame.
-			\item The source for this frame looks like ...
+			\item Project Context: Forecasting the quarterly growh rate of the Bitcoin.
+			\item Potential Drivers: US unemployment rate, the US inflation rate, the federal funds rate and the growth rate of the S\&P 500
+			\item *
 		\end{itemize}
 	\end{frame}
-	\section{newSection2}
-	\begin{frame}
-		\begin{columns}
-			\begin{column}{0.4\textwidth}
+	\section{Data}
+	\subsection{Data Recruitment}
+		\begin{frame}
+		\frametitle{Data}
+		\framesubtitle{Data Recruitment}
+			\begin{columns}
+				\begin{column}{0.5\textwidth}
+					\textbf{Historical Bitcoin Data}
+					\begin{itemize}
+						\item \emph {Investing.com}
+						\item One of the top three global financial websites in the world.
+					\end{itemize}
+				\end{column}
+				\begin{column}{0.5\textwidth}
+					\textbf{Other Drivers}
 				\begin{itemize}
-					\item Use the columns ...
-					\item The argument ...
-					\item See also the ...
+					\item \emph{FRED-QD}
+					\item It is a large macroeconomic database designed for the empirical analysis of “big data.”
 				\end{itemize}
-			\end{column}
-			\begin{column}{0.6\textwidth}
-				I should \emph{emphasise} that this is an \alert{important} point.
-				Text in \textbf{bold face}. Text in \textit{italics}.
-				It \textcolor{red}{stops} and \textcolor{green}{starts}.
-			\end{column}
+				\end{column}
 		\end{columns}
 	\end{frame}
+	\subsection{Dataset Properties}	
 	\begin{frame}
-		%\begin{figure}
-		%	\includegraphics[
-		%	width=0.5\textwidth]{gerbil}
-		%\end{figure}
-		\begin{tabular}{lrr}
-			Item & Qty & Unit \$ \\
-			Widget & 1 & 199.99 \\
-			Gadget & 2 & 399.99 \\
-			Cable & 3 & 19.99 \\
-		\end{tabular}
-		\begin{tabular}{|l|r|r|} \hline
-			Item & Qty & Unit \$ \\\hline
-			Widget & 1 & 199.99 \\
-			Gadget & 2 & 399.99 \\
-			Cable & 3 & 19.99 \\\hline
-		\end{tabular}
+	\frametitle{Data}
+		\framesubtitle{Dataset Properties}
+		\begin{columns}
+				\begin{column}{0.5\textwidth}
+					\textbf{Historical Bitcoin Data}
+					\begin{itemize}
+						\item \emph{.csv} format
+						\item Starts from Q3 2010
+						\item Runs daily, over 4650 data points and counting
+						\item 7 columns in total namely: \emph{Date, Price, Open, High, Low, Volume, Change \%}
+					\end{itemize}
+				\end{column}
+				\begin{column}{0.5\textwidth}
+					\textbf{Other Drivers}
+				\begin{itemize}
+					\item \emph{.csv} format
+					\item Starts from Q1 1959
+					\item Runs \emph{quarterly,} over 200 individual columns
+				\end{itemize}
+				\end{column}
+		\end{columns}
+	\end{frame}
+	\subsection{Data Operations}	
+	\begin{frame}
+	\frametitle{Data}
+		\framesubtitle{Data Operations}
+		\begin{columns}
+				\begin{column}{0.5\textwidth}
+					\textbf{Historical Bitcoin Data}
+					\begin{itemize}
+						\item \emph{.csv} format
+						\item Starts from Q3 2010
+						\item Runs daily, over 4650 data points and counting
+						\item 7 columns in total namely: \emph{Date, Price, Open, High, Low, Volume, Change \%}
+					\end{itemize}
+				\end{column}
+				\begin{column}{0.5\textwidth}
+					\textbf{Other Drivers}
+				\begin{itemize}
+					\item \emph{.csv} format
+					\item Starts from Q1 1959
+					\item Runs \emph{quarterly,} over 200 individual columns
+				\end{itemize}
+				\end{column}
+		\end{columns}
 	\end{frame}
 	\begin{frame}
 		\begin{block}{Interesting Fact}
@@ -66,12 +101,5 @@ Deniz \textbf{Uygur}}
 			This is really important!
 		\end{alertblock}
 	\end{frame}
-	%\begin{frame}
-		\begin{tikzpicture}
-			\draw (0,0) -- (1,1); % a line
-		\end{tikzpicture}
-	%\end{frame}
-	\begin{tikzpicture}
-		\draw[help lines] (0,0) grid (3,3);
-	\end{tikzpicture}
+	
 \end{document}
