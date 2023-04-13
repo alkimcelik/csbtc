@@ -36,6 +36,7 @@ my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
 
 #Alkim
 df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
 
 
 #########Data Manipulation########
@@ -74,6 +75,22 @@ df_price_quarterly$change <- change_func(df_price_quarterly$price, df_price_quar
 df_price_quarterly = df_price_quarterly[-c(52),] #last quarter not finished
 df_price_quarterly$lag <- na.fill(df_price_quarterly$lag, 0)
 df_price_quarterly$change <- na.fill(df_price_quarterly$change, 0)
+
+
+df_drivers <- df_drivers %>% select(c('sasdate','UNRATE','CPIAUCSL', 'CPILFESL', 'FEDFUNDS', 
+                                      'S.P.500', 'S.P..indust', 'S.P.div.yield',
+                                      'S.P.PE.ratio')) 
+df_drivers = df_drivers[-c(1,2),]
+df_drivers$sasdate <- as.Date(df_drivers$sasdate, format = "%m/%d/%Y") 
+df_drivers <- df_drivers %>% filter (df_drivers$sasdate >= "2010-06-01")
+df_drivers$lag_unrate <- lag(df_drivers$UNRATE)
+df_drivers$unrate_change <- change_func(df_drivers$UNRATE, df_drivers$lag_unrate)
+df_drivers <- cbind(df_drivers,df_price_quarterly$quarter)
+
+
+combined_df <- cbind(df_price_quarterly,df_drivers[,-c(1,ncol(df_drivers))])
+combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
+
 
 plot(x = as.yearqtr(df_price_quarterly$quarter, format = '%Y Q%q'), y = df_price_quarterly$price, type = 'l')
 
@@ -135,21 +152,6 @@ gglagplot(bit_ts, do.lines = F) + my_theme +
 #df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
 
 #Alkim
-df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
-
-df_drivers <- df_drivers %>% select(c('sasdate','UNRATE','CPIAUCSL', 'CPILFESL', 'FEDFUNDS', 
-                      'S.P.500', 'S.P..indust', 'S.P.div.yield',
-                      'S.P.PE.ratio')) 
-df_drivers = df_drivers[-c(1,2),]
-df_drivers$sasdate <- as.Date(df_drivers$sasdate, format = "%m/%d/%Y") 
-df_drivers <- df_drivers %>% filter (df_drivers$sasdate >= "2010-06-01")
-df_drivers$lag_unrate <- lag(df_drivers$UNRATE)
-df_drivers$unrate_change <- change_func(df_drivers$UNRATE, df_drivers$lag_unrate)
-df_drivers <- cbind(df_drivers,df_price_quarterly$quarter)
-
-
-combined_df <- cbind(df_price_quarterly,df_drivers[,-c(1,ncol(df_drivers))])
-combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
 ggplot(combined_df, aes(x=as.yearqtr(combined_df$quarter, format = '%Y Q%q'))) + 
   geom_line(aes(y = log(combined_df$price)), color = "darkred") + 
   geom_line(aes(y = combined_df$UNRATE), color="steelblue", linetype="twodash") 
