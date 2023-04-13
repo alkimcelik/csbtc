@@ -13,6 +13,7 @@ library(tidyr)
 library(scales)
 conflict_prefer('select', 'dplyr')
 conflict_prefer('filter', 'dplyr')
+conflict_prefer('lag', 'dplyr')
 change_func <- function(col1, col2){
   change <- ((col1 - col2)/col2)*100
   return(change)
@@ -67,8 +68,7 @@ df$contains_str <- NULL
 
 df$Change <- as.numeric(sub("%", "", df$Change, fixed=TRUE))/100
 
-df$quarter <- paste(year(df$Date),quarters(df$Date))
-df$transformed_price <- box
+df$quarter <- paste(mondate::year(df$Date),quarters(df$Date))
 df_price_quarterly <- df %>% group_by(quarter) %>% summarise(price = mean(Price))
 df_price_quarterly$lag <- lag(df_price_quarterly$price)
 df_price_quarterly$change <- change_func(df_price_quarterly$price, df_price_quarterly$lag)
@@ -80,12 +80,21 @@ df_price_quarterly$change <- na.fill(df_price_quarterly$change, 0)
 df_drivers <- df_drivers %>% select(c('sasdate','UNRATE','CPIAUCSL', 'CPILFESL', 'FEDFUNDS', 
                                       'S.P.500', 'S.P..indust', 'S.P.div.yield',
                                       'S.P.PE.ratio')) 
+colnames(df_drivers) <- c('Date', 'Unemp_Rate', 'CPIAUCSL', 'CPILFESL', 'Fed_Funds',
+                          'SP_500', 'SP_Industrial', 'SP_Dividend_Yield', 'SP_PE_Ratio')
 df_drivers = df_drivers[-c(1,2),]
-df_drivers$sasdate <- as.Date(df_drivers$sasdate, format = "%m/%d/%Y") 
-df_drivers <- df_drivers %>% filter (df_drivers$sasdate >= "2010-06-01")
-df_drivers$lag_unrate <- lag(df_drivers$UNRATE)
-df_drivers$unrate_change <- change_func(df_drivers$UNRATE, df_drivers$lag_unrate)
+df_drivers$Date <- as.Date(df_drivers$Date, format = "%m/%d/%Y") 
+df_drivers <- df_drivers %>% filter (df_drivers$Date >= "2010-06-01")
+df_drivers$lag_unrate <- lag(df_drivers$Unemp_Rate)
+df_drivers$unrate_change <- change_func(df_drivers$Unemp_Rate, df_drivers$lag_unrate)
+df_drivers$SP_500_lag <- lag(df_drivers$SP_500)
+df_drivers$SP_500_change <- change_func(df_drivers$SP_500, df_drivers$SP_500_lag)
+df_drivers$CPIAUCSL_lag <- lag(df_drivers$CPIAUCSL)
+df_drivers$CPIAUCSL_change <- change_func(df_drivers$CPIAUCSL, df_drivers$CPIAUCSL_lag)
+df_drivers$CPILFESL_lag <- lag(df_drivers$CPILFESL)
+df_drivers$CPILFESL_change <- change_func(df_drivers$CPILFESL, df_drivers$CPILFESL_lag)
 df_drivers <- cbind(df_drivers,df_price_quarterly$quarter)
+
 
 
 combined_df <- cbind(df_price_quarterly,df_drivers[,-c(1,ncol(df_drivers))])
@@ -99,28 +108,34 @@ plot.new()
 #Bitcoin price
 ggplot(df, aes(x = Date, y = Price)) +
   geom_line(color = 'darkgreen') + theme_minimal() + ylab('Price ($)') +
-  title('Bitcoin Daily Price between July 2010 to April 2023')
+  ggtitle('Bitcoin Daily Price between July 2010 to April 2023')
 
 #Bitcoin price starting 2017
 ggplot(df %>% filter(Date >= '2017-01-01'), aes(x = Date, y = Price)) +
   geom_line(color = 'darkgreen') + theme_minimal() + ylab('Price ($)') +
-  title('Bitcoin Daily Price between January 2017 to April 2023')
+  ggtitle('Bitcoin Daily Price between January 2017 to April 2023')
 
 #Time series decomposition
 price_ts <- ts(df[order(df$Date),]$Price, start = c(2010,7), frequency = 365)
 decomp <- decompose(price_ts, type = 'multiplicative')
 plot(decomp)
 
+
 #Other factors plots
 #CPI
-ggplot(melt(data.table(df_drivers %>% select(sasdate,CPIAUCSL,CPILFESL)), id.vars = c('sasdate')), aes(x=sasdate)) + 
-  geom_line(aes(y = value, color = variable), linewidth = 0.8) + 
-  theme_minimal() + ylab('CPI') + xlab('Quarters') +
-  ggtitle('Quarterly CPI Values between 2010 Q3 and 2023 Q1') 
+ggplot(melt(data.table(df_drivers %>% select(Date,CPIAUCSL_change,CPILFESL_change)), 
+            id.vars = c('Date')), aes(x=Date)) + 
+  geom_line(aes(y = value/100, color = variable), linewidth = 0.8) + 
+  scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00"), labels = c('CPI', 'CPI Core')) + # Add color legend with blue and orange colors
+  theme_minimal() + ylab('Change') + xlab('Quarters') +
+  scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
+               labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
+  ggtitle('CPI Growth between 2010 Q3 and 2023 Q1') +
+  scale_y_continuous(labels = scales::percent_format())
 
 #Federal Funds Rate
-ggplot(df_drivers, aes(x=sasdate)) + 
-  geom_line(aes(y = FEDFUNDS/100),color = '#D55E00', linewidth = 0.8) + 
+ggplot(df_drivers, aes(x=Date)) + 
+  geom_line(aes(y = Fed_Funds/100),color = 'chocolate4', linewidth = 0.8) + 
   theme_minimal() + ylab('Federal Funds Rate') + xlab('Quarters') +
   scale_y_continuous(labels = percent_format()) +
   scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
@@ -128,6 +143,23 @@ ggplot(df_drivers, aes(x=sasdate)) +
   ggtitle('Quarterly Federal Funds Rates between 2010 Q3 and 2023 Q1') 
 
 
+#SP 500
+ggplot(df_drivers, aes(x=Date)) + 
+  geom_line(aes(y = SP_500_change/100),color = 'firebrick', linewidth = 0.8) + 
+  theme_minimal() + ylab('Change') + xlab('Quarters') +
+  scale_y_continuous(labels = percent_format()) +
+  scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
+               labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
+  ggtitle('S&P 500 Quarterly Change between 2010 Q3 and 2023 Q1') 
+
+#Unemployment
+ggplot(df_drivers, aes(x=Date)) + 
+  geom_line(aes(y = Unemp_Rate/100),color = 'dodgerblue3', linewidth = 0.8) + 
+  theme_minimal() + ylab('Unemployment Rate') + xlab('Quarters') +
+  scale_y_continuous(labels = percent_format()) +
+  scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
+               labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
+  ggtitle('Unemployment Rate between 2010 Q3 and 2023 Q1') 
 
 #Lag correlation
 bit_ts = df %>%
@@ -138,11 +170,13 @@ bit_ts = df %>%
   ts()
 
 gglagplot(bit_ts, do.lines = F) + my_theme +
-  scale_color_continuous(low = "#b37400", high = "#ffc04d", breaks = c(1, 366, 731), labels = c('2017', '2018', '2019')) + 
+  scale_color_continuous(low = "#00008B", high = "#ADD8E6", breaks = c(183, 548, 913, 1278, 1643, 2008), 
+                         labels = c('2017', '2018', '2019', '2020', '2021', '2022')) + 
   scale_y_continuous(breaks = c(0, 20000, 40000, 60000), 
                      labels = c('$0', '$20,000', '$40,000', '$60,000')) +
   scale_x_continuous(breaks = c(20000, 40000, 60000), 
-                     labels = c('$20,000', '$40,000', '$60,000'))
+                     labels = c('$20,000', '$40,000', '$60,000')) +
+  ggtitle('Correlation Graph of the Bitcoin Price')
   
 
 #########Potential Drivers########
