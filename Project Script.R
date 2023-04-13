@@ -8,6 +8,11 @@ library(VGAM)
 library(MASS)
 library(car)
 library(forecast)
+library(conflicted)
+library(tidyr)
+library(scales)
+conflict_prefer('select', 'dplyr')
+conflict_prefer('filter', 'dplyr')
 change_func <- function(col1, col2){
   change <- ((col1 - col2)/col2)*100
   return(change)
@@ -73,7 +78,7 @@ df_price_quarterly$change <- na.fill(df_price_quarterly$change, 0)
 plot(x = as.yearqtr(df_price_quarterly$quarter, format = '%Y Q%q'), y = df_price_quarterly$price, type = 'l')
 
 #######PLOTTING#######
-
+plot.new()
 #Bitcoin price
 ggplot(df, aes(x = Date, y = Price)) +
   geom_line(color = 'darkgreen') + theme_minimal() + ylab('Price ($)') +
@@ -84,11 +89,30 @@ ggplot(df %>% filter(Date >= '2017-01-01'), aes(x = Date, y = Price)) +
   geom_line(color = 'darkgreen') + theme_minimal() + ylab('Price ($)') +
   title('Bitcoin Daily Price between January 2017 to April 2023')
 
+#Time series decomposition
 price_ts <- ts(df[order(df$Date),]$Price, start = c(2010,7), frequency = 365)
 decomp <- decompose(price_ts, type = 'multiplicative')
 plot(decomp)
 
+#Other factors plots
+#CPI
+ggplot(melt(data.table(df_drivers %>% select(sasdate,CPIAUCSL,CPILFESL)), id.vars = c('sasdate')), aes(x=sasdate)) + 
+  geom_line(aes(y = value, color = variable), linewidth = 0.8) + 
+  theme_minimal() + ylab('CPI') + xlab('Quarters') +
+  ggtitle('Quarterly CPI Values between 2010 Q3 and 2023 Q1') 
 
+#Federal Funds Rate
+ggplot(df_drivers, aes(x=sasdate)) + 
+  geom_line(aes(y = FEDFUNDS/100),color = '#D55E00', linewidth = 0.8) + 
+  theme_minimal() + ylab('Federal Funds Rate') + xlab('Quarters') +
+  scale_y_continuous(labels = percent_format()) +
+  scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
+               labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
+  ggtitle('Quarterly Federal Funds Rates between 2010 Q3 and 2023 Q1') 
+
+
+
+#Lag correlation
 bit_ts = df %>%
   filter(Date > as.Date('2017-01-01')) %>%
   arrange(Date) %>%
