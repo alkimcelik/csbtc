@@ -2,7 +2,7 @@
 \usetheme{Berlin}
 %\usecolortheme{beetle}
 \title{Case Studies - Forecasting Bitcoin: \\Data Presentation}
-\author{Elcin \textbf {Babayev}\\
+\author{Elchin \textbf {Babayev}\\
 Mert \textbf{Basaran}\\
 Alkim Can \textbf{Celik}\\
 Halil Anil \textbf{Demirbas}\\
@@ -73,25 +73,27 @@ Deniz \textbf{Uygur}}
 	\begin{frame}
 	\frametitle{Data}
 		\framesubtitle{Data Operations}
-		\begin{columns}
-				\begin{column}{0.5\textwidth}
 					\textbf{Historical Bitcoin Data}
 					\begin{itemize}
-						\item \emph{.csv} format
-						\item Starts from Q3 2010
-						\item Runs daily, over 4650 data points and counting
-						\item 7 columns in total namely: \emph{Date, Price, Open, High, Low, Volume, Change \%}
+						\item Added a column called \emph{change,} according to the growth rate formula
+						\item Fixed the \emph{volume} column which had \emph{K, M, B} corresponding to thousand, million and billion.
+						\item Changed the time index to be readible by R.
+						\item Daily data has been aggregated to be quarterly data using averages over the given period.
 					\end{itemize}
-				\end{column}
-				\begin{column}{0.5\textwidth}
-					\textbf{Other Drivers}
-				\begin{itemize}
-					\item \emph{.csv} format
-					\item Starts from Q1 1959
-					\item Runs \emph{quarterly,} over 200 individual columns
-				\end{itemize}
-				\end{column}
-		\end{columns}
+	\end{frame}
+	\begin{frame}
+		\textbf{Other Drivers}
+			\begin{itemize}
+			\item In total of 8 columns have been used, namely \emph{UNRATE','CPIAUCSL', 'CPILFESL', 'FEDFUNDS', 'S.P.500', 'S.P..indust', 'S.P.div.yield'}
+			\item *
+			\item *
+		\end{itemize}
+		\begin{tabular}{|l|r|r|} \hline
+			Column & Description \$ \\\hline
+			UNRATE & Civilian Unemployment Rate (Percent) \\
+			CPIAUCSL & Consumer Price Index for All Urban Consumers: All Items \\
+			CPILFESL & Consumer Price Index for All Urban Consumers: All Items Less Food Energy \\\hline
+		\end{tabular}		
 	\end{frame}
 	\begin{frame}
 		\begin{block}{Interesting Fact}
