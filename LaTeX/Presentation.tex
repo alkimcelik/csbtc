@@ -85,15 +85,93 @@ Deniz \textbf{Uygur}}
 		\textbf{Other Drivers}
 			\begin{itemize}
 			\item In total of 8 columns have been used, namely \emph{UNRATE','CPIAUCSL', 'CPILFESL', 'FEDFUNDS', 'S.P.500', 'S.P..indust', 'S.P.div.yield'}
-			\item *
-			\item *
+			\end{itemize}
+		{\scriptsize
+		\begin{tabular}{|l|l|} \hline
+			Column & Description \\ \hline
+			UNRATE & Civilian Unemployment Rate (Percent) \\ 
+			CPIAUCSL & CPI for All Urban Consumers: All Items \\
+			CPILFESL & CPI for All Urban Consumers: All Items Less Food Energy \\
+			FEDFUNDS & Effective Federal Funds Rate\\
+			S.P.500 & S\&P’s Common Stock Price Index: Composite\\
+			S.P..indust & S\&P’s Common Stock Price Index: Industrials\\
+			S.P.div.yield & S\&P’s Composite Common Stock: Dividend Yield\\ \hline
+		\end{tabular}}		
+	\end{frame}
+	\begin{frame}
+		\textbf{Other Drivers}
+		\begin{itemize}
+			\item Created data for \emph{infilation} from the CPI
+			\item Derived the growth rate for S\&P indexes
 		\end{itemize}
-		\begin{tabular}{|l|r|r|} \hline
-			Column & Description \$ \\\hline
-			UNRATE & Civilian Unemployment Rate (Percent) \\
-			CPIAUCSL & Consumer Price Index for All Urban Consumers: All Items \\
-			CPILFESL & Consumer Price Index for All Urban Consumers: All Items Less Food Energy \\\hline
-		\end{tabular}		
+		All of the variables have been combined in a dataframe called \emph{combined\_df}
+	\end{frame}
+	\subsection{Data Visualisations}
+	\begin{frame}
+	\frametitle{Data}
+	\framesubtitle{Data Visualisations}
+		\begin{figure}
+			\includegraphics[
+			width=0.75\textwidth]{BTC_Daily_all}
+			\caption{Historical Bitcoin Price Data}
+			\label{fig:BTCall}
+		\end{figure}
+	\end{frame}
+	\begin{frame}
+	\begin{figure}
+			\includegraphics[
+			width=0.75\textwidth]{BTC_Daily_2017}
+			\caption{Historical Bitcoin Price Data 2017-2023}
+			\label{fig:BTCpart}
+		\end{figure}
+	\end{frame}
+	\begin{frame}
+	\begin{figure}
+			\includegraphics[
+			width=0.75\textwidth]{BTC_Daily_Decomposition}
+			\caption{BTC Daily Decomposition}
+			\label{fig:BTCdecomp}
+		\end{figure}
+	\end{frame}
+	\begin{frame}
+	\begin{figure}
+			\includegraphics[
+			width=0.75\textwidth]{BTC_lag_corr}
+			\caption{BTC Lagged correlations}
+			\label{fig:BTCcorr}
+		\end{figure}
+	\end{frame}
+	\begin{frame}
+	\begin{figure}
+			\includegraphics[
+			width=0.75\textwidth]{Unemployment}
+			\caption{Quarterly Unemployment}
+			\label{fig:Unemp}
+		\end{figure}
+	\end{frame}
+	\begin{frame}
+	\begin{figure}
+			\includegraphics[
+			width=0.75\textwidth]{CPI_Growth}
+			\caption{Infilation Rate}
+			\label{fig:Inf}
+		\end{figure}
+	\end{frame}
+	\begin{frame}
+	\begin{figure}
+			\includegraphics[
+			width=0.75\textwidth]{Federal_Funds_Rate}
+			\caption{Federal Funds Rate}
+			\label{fig:FED}
+		\end{figure}
+	\end{frame}
+	\begin{frame}
+	\begin{figure}
+			\includegraphics[
+			width=0.75\textwidth]{S&P_Quarterly}
+			\caption{Quarterly S\&P}
+			\label{fig:sP}
+		\end{figure}
 	\end{frame}
 	\begin{frame}
 		\begin{block}{Interesting Fact}
