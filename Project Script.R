@@ -11,6 +11,7 @@ library(forecast)
 library(conflicted)
 library(tidyr)
 library(scales)
+library(reshape2)
 conflict_prefer('select', 'dplyr')
 conflict_prefer('filter', 'dplyr')
 conflict_prefer('lag', 'dplyr')
@@ -115,6 +116,35 @@ ggplot(df %>% filter(Date >= '2017-01-01'), aes(x = Date, y = Price)) +
   geom_line(color = 'darkgreen') + theme_minimal() + ylab('Price ($)') +
   ggtitle('Bitcoin Daily Price between January 2017 to April 2023')
 
+#Bitcoin Growth Rate
+ggplot(combined_df, aes(x = as.yearqtr(combined_df$quarter, format = '%Y Q%q'))) +
+  geom_line(aes(y = change/100),color = 'darkgreen', linewidth = 1) + 
+  geom_point(aes(y = change/100),color = 'darkgreen') +
+  theme_minimal() + ylab('Price ($)') + xlab('Quarters') +
+  ggtitle('Bitcoin Quarterly Growth Rate between 2010 Q3 to 2023 Q1') +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_x_yearqtr(breaks = seq(min(as.yearqtr(combined_df$quarter)), 
+                               max(as.yearqtr(combined_df$quarter)), 
+                               by = 1),
+                  labels = function(x) format(x, "%Y Q%q"),
+                  expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
+
+combined_df_2017 <- combined_df %>% filter(as.yearqtr(df_price_quarterly$quarter, format = '%Y Q%q') >= '2017 Q1')
+
+ggplot(combined_df_2017, aes(x = as.yearqtr(combined_df_2017$quarter, format = '%Y Q%q'))) +
+  geom_line(aes(y = change/100),color = 'darkgreen', linewidth = 1) + 
+  geom_point(aes(y = change/100),color = 'darkgreen') +
+  theme_minimal() + ylab('Growth Rate') + xlab('Quarters') +
+  ggtitle('Bitcoin Quarterly Growth Rate between 2017 Q1 to 2023 Q1') +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_x_yearqtr(breaks = seq(min(as.yearqtr(combined_df_2017$quarter)), 
+                               max(as.yearqtr(combined_df_2017$quarter)), 
+                               by = 1/4),
+                  labels = function(x) format(x, "%Y Q%q"),
+                  expand = c(0, 0)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
+
 #Time series decomposition
 price_ts <- ts(df[order(df$Date),]$Price, start = c(2010,7), frequency = 365)
 decomp <- decompose(price_ts, type = 'multiplicative')
@@ -177,6 +207,23 @@ gglagplot(bit_ts, do.lines = F) + my_theme +
   scale_x_continuous(breaks = c(20000, 40000, 60000), 
                      labels = c('$20,000', '$40,000', '$60,000')) +
   ggtitle('Correlation Graph of the Bitcoin Price')
+
+# Correlation heatmap
+correlation <- round(cor(combined_df[,c(2,5:11)], use = "complete.obs"),2)
+correlation[upper.tri(correlation)] <- NA
+correlation <- na.omit(reshape2::melt(correlation))
+
+# Create ggplot without NA values and move y-ticks to the right side
+ggplot(data = correlation, aes(x = Var2, y = Var1, fill = value)) + 
+  geom_tile() +
+  geom_text(aes(label = sprintf("%1.2f", value)), size = 4) + # show correlation values with 2 decimal places
+  scale_fill_gradient2(low = "red", high = "green", limit = c(-1, 1), name = "Correlation") +
+  scale_x_discrete(expand = c(0,0)) + # remove gray areas in x-axis
+  scale_y_discrete(expand = c(0,0)) + # remove gray areas in y-axis
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.background = element_blank()) +
+  ggtitle('Correlation Heatmap')
   
 
 #########Potential Drivers########
@@ -185,7 +232,7 @@ gglagplot(bit_ts, do.lines = F) + my_theme +
 #Elcin
 #df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
 
-#Alkim
-ggplot(combined_df, aes(x=as.yearqtr(combined_df$quarter, format = '%Y Q%q'))) + 
-  geom_line(aes(y = log(combined_df$price)), color = "darkred") + 
-  geom_line(aes(y = combined_df$UNRATE), color="steelblue", linetype="twodash") 
+
+
+
+
