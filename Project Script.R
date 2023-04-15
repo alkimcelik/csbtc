@@ -12,6 +12,8 @@ library(conflicted)
 library(tidyr)
 library(scales)
 library(reshape2)
+library(psych)
+
 conflict_prefer('select', 'dplyr')
 conflict_prefer('filter', 'dplyr')
 conflict_prefer('lag', 'dplyr')
@@ -108,19 +110,20 @@ plot(x = as.yearqtr(df_price_quarterly$quarter, format = '%Y Q%q'), y = df_price
 plot.new()
 #Bitcoin price
 ggplot(df, aes(x = Date, y = Price)) +
-  geom_line(color = 'darkgreen') + theme_minimal() + ylab('Price ($)') +
-  ggtitle('Bitcoin Daily Price between July 2010 to April 2023')
+  geom_line(color = 'darkgreen') +  ylab('Price ($)') +
+  ggtitle('Bitcoin Daily Price between July 2010 to April 2023') +
+  theme(axis.text.x = element_text(size = 12)) 
 
 #Bitcoin price starting 2017
 ggplot(df %>% filter(Date >= '2017-01-01'), aes(x = Date, y = Price)) +
-  geom_line(color = 'darkgreen') + theme_minimal() + ylab('Price ($)') +
+  geom_line(color = 'darkgreen') + ylab('Price ($)') +
   ggtitle('Bitcoin Daily Price between January 2017 to April 2023')
 
 #Bitcoin Growth Rate
 ggplot(combined_df, aes(x = as.yearqtr(combined_df$quarter, format = '%Y Q%q'))) +
   geom_line(aes(y = change/100),color = 'darkgreen', linewidth = 1) + 
   geom_point(aes(y = change/100),color = 'darkgreen') +
-  theme_minimal() + ylab('Price ($)') + xlab('Quarters') +
+  ylab('Growth Rate') + xlab('Quarters') +
   ggtitle('Bitcoin Quarterly Growth Rate between 2010 Q3 to 2023 Q1') +
   scale_y_continuous(labels = scales::percent_format()) +
   scale_x_yearqtr(breaks = seq(min(as.yearqtr(combined_df$quarter)), 
@@ -135,7 +138,7 @@ combined_df_2017 <- combined_df %>% filter(as.yearqtr(df_price_quarterly$quarter
 ggplot(combined_df_2017, aes(x = as.yearqtr(combined_df_2017$quarter, format = '%Y Q%q'))) +
   geom_line(aes(y = change/100),color = 'darkgreen', linewidth = 1) + 
   geom_point(aes(y = change/100),color = 'darkgreen') +
-  theme_minimal() + ylab('Growth Rate') + xlab('Quarters') +
+  ylab('Growth Rate') + xlab('Quarters') +
   ggtitle('Bitcoin Quarterly Growth Rate between 2017 Q1 to 2023 Q1') +
   scale_y_continuous(labels = scales::percent_format()) +
   scale_x_yearqtr(breaks = seq(min(as.yearqtr(combined_df_2017$quarter)), 
@@ -145,19 +148,62 @@ ggplot(combined_df_2017, aes(x = as.yearqtr(combined_df_2017$quarter, format = '
                   expand = c(0, 0)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
-#Time series decomposition
+#Time series decomposition - Bitcoin
 price_ts <- ts(df[order(df$Date),]$Price, start = c(2010,7), frequency = 365)
 decomp <- decompose(price_ts, type = 'multiplicative')
-plot(decomp)
 
+df_decomp <- data.frame(
+  x = time(price_ts),
+  trend = decomp$trend,
+  seasonal = decomp$seasonal,
+  random = decomp$random
+)
 
+# melt the data frame into long format
+df_comp_long <- melt(df_decomp, id.vars = 'x')
+
+# create the plot
+ggplot(df_comp_long, aes(x = x, y = value)) +
+  geom_line() +
+  facet_wrap(~variable, scales = 'free', nrow = 3) +
+  labs(x = 'Date', y = NULL) +
+  theme_bw()
+
+#Time series decomposition - S&P 500
+sp500_ts <- ts(df_drivers[order(df_drivers$Date),]$SP_500, start = c(2010,3), frequency = 4)
+decomp_sp500 <- decompose(sp500_ts, type = 'multiplicative')
+
+df_decomp_sp500 <- data.frame(
+  x = time(sp500_ts),
+  trend = decomp_sp500$trend,
+  seasonal = decomp_sp500$seasonal,
+  random = decomp_sp500$random
+)
+
+# melt the data frame into long format
+df_comp_long_sp500 <- melt(df_decomp_sp500, id.vars = 'x')
+
+# create the plot
+ggplot(df_comp_long_sp500, aes(x = x, y = value)) +
+  geom_line() +
+  facet_wrap(~variable, scales = 'free', nrow = 3) +
+  labs(x = 'Date', y = NULL) +
+  theme_bw()
 #Other factors plots
+#S&P 500
+ggplot(df_drivers, aes(x=Date)) + 
+  geom_line(aes(y = SP_500),color = 'firebrick', linewidth = 0.8) + 
+  ylab('Price ($)') + xlab('Quarters') +
+  scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
+               labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
+  ggtitle('Quarterly S&P 500 between 2010 Q3 and 2023 Q1') 
+
 #CPI
 ggplot(melt(data.table(df_drivers %>% select(Date,CPIAUCSL_change,CPILFESL_change)), 
             id.vars = c('Date')), aes(x=Date)) + 
   geom_line(aes(y = value/100, color = variable), linewidth = 0.8) + 
   scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00"), labels = c('CPI', 'CPI Core')) + # Add color legend with blue and orange colors
-  theme_minimal() + ylab('Change') + xlab('Quarters') +
+  ylab('Growth Rate') + xlab('Quarters') +
   scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
                labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
   ggtitle('CPI Growth between 2010 Q3 and 2023 Q1') +
@@ -173,7 +219,7 @@ ggplot(df_drivers, aes(x=Date)) +
   ggtitle('Quarterly Federal Funds Rates between 2010 Q3 and 2023 Q1') 
 
 
-#SP 500
+#SP 500 Change
 ggplot(df_drivers, aes(x=Date)) + 
   geom_line(aes(y = SP_500_change/100),color = 'firebrick', linewidth = 0.8) + 
   theme_minimal() + ylab('Change') + xlab('Quarters') +
