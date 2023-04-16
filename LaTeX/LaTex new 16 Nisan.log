@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.4.16)  16 APR 2023 18:25
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.4.16)  16 APR 2023 18:27
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**Presentation.tex
-(./Presentation.tex
+**"LaTex new 16 Nisan.tex"
+(./LaTex new 16 Nisan.tex
 LaTeX2e <2022-11-01> patch level 1
 L3 programming layer <2023-02-22>
 (/usr/local/texlive/2023/texmf-dist/tex/latex/beamer/beamer.cls
@@ -807,15 +807,8 @@ File: l3backend-pdftex.def 2023-01-16 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count343
 \l__pdf_internal_box=\box81
 )
-(./Presentation.aux
-
-LaTeX Warning: Label `fig:BTCpart1' multiply defined.
-
-
-LaTeX Warning: Label `fig:Unemp' multiply defined.
-
-)
-\openout1 = `Presentation.aux'.
+No file "LaTex new 16 Nisan".aux.
+\openout1 = `"LaTex new 16 Nisan.aux"'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 13.
 LaTeX Font Info:    ... okay on input line 13.
@@ -835,7 +828,6 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 13.
 LaTeX Font Info:    ... okay on input line 13.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 13.
 LaTeX Font Info:    ... okay on input line 13.
-
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -893,10 +885,8 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
 Package hyperref Info: Link coloring OFF on input line 13.
-
-(./Presentation.out) (./Presentation.out)
 \@outlinefile=\write5
-\openout5 = `Presentation.out'.
+\openout5 = `"LaTex new 16 Nisan.out"'.
 
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
 (Font)                  OT1/cmr/m/n --> OT1/cmss/m/n on input line 13.
@@ -974,16 +964,17 @@ Dictionary: translator-numbers-dictionary, Language: English
 (/usr/local/texlive/2023/texmf-dist/tex/latex/translator/translator-theorem-dic
 tionary-English.dict
 Dictionary: translator-theorem-dictionary, Language: English 
-) (./Presentation.nav) [1{/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/up
-dmap/pdftex.map}
+)
+No file "LaTex new 16 Nisan".nav.
+[1
 
-] [2
+{/usr/local/texlive/2023/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+[2
 
 ]
 LaTeX Font Info:    Trying to load font information for U+msa on input line 47.
 
-
-(/usr/local/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd
+ (/usr/local/texlive/2023/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
 LaTeX Font Info:    Trying to load font information for U+msb on input line 47.
@@ -1009,7 +1000,7 @@ thkerncmss.
 ] [7
 
 ]
-<BTC_Daily_all.png, id=444, 838.13126pt x 441.65pt>
+<BTC_Daily_all.png, id=215, 838.13126pt x 441.65pt>
 File: BTC_Daily_all.png Graphic file (type png)
 <use BTC_Daily_all.png>
 Package pdftex.def Info: BTC_Daily_all.png  used on input line 119.
@@ -1019,7 +1010,7 @@ Package pdftex.def Info: BTC_Daily_all.png  used on input line 119.
  <./BTC_Daily_all.png>] [9
 
 ]
-<BTC_Daily_2017.png, id=549, 838.13126pt x 441.65pt>
+<BTC_Daily_2017.png, id=275, 838.13126pt x 441.65pt>
 File: BTC_Daily_2017.png Graphic file (type png)
 <use BTC_Daily_2017.png>
 Package pdftex.def Info: BTC_Daily_2017.png  used on input line 139.
@@ -1027,7 +1018,7 @@ Package pdftex.def Info: BTC_Daily_2017.png  used on input line 139.
  [10
 
  <./BTC_Daily_2017.png>]
-<BTC_Growth_2017.png, id=603, 838.13126pt x 441.65pt>
+<BTC_Growth_2017.png, id=305, 838.13126pt x 441.65pt>
 File: BTC_Growth_2017.png Graphic file (type png)
 <use BTC_Growth_2017.png>
 Package pdftex.def Info: BTC_Growth_2017.png  used on input line 148.
@@ -1035,7 +1026,7 @@ Package pdftex.def Info: BTC_Growth_2017.png  used on input line 148.
 [11
 
  <./BTC_Growth_2017.png>]
-<BTC_G_All.png, id=656, 838.13126pt x 441.65pt>
+<BTC_G_All.png, id=335, 838.13126pt x 441.65pt>
 File: BTC_G_All.png Graphic file (type png)
 <use BTC_G_All.png>
 Package pdftex.def Info: BTC_G_All.png  used on input line 157.
@@ -1049,7 +1040,7 @@ l.157 	\end{frame}
                    [12
 
  <./BTC_G_All.png>]
-<BTC_decom.png, id=709, 838.13126pt x 386.44376pt>
+<BTC_decom.png, id=365, 838.13126pt x 386.44376pt>
 File: BTC_decom.png Graphic file (type png)
 <use BTC_decom.png>
 Package pdftex.def Info: BTC_decom.png  used on input line 173.
@@ -1057,7 +1048,7 @@ Package pdftex.def Info: BTC_decom.png  used on input line 173.
  [13
 
  <./BTC_decom.png>]
-<BTC_lag_corr.png, id=763, 696.35156pt x 439.6425pt>
+<BTC_lag_corr.png, id=396, 696.35156pt x 439.6425pt>
 File: BTC_lag_corr.png Graphic file (type png)
 <use BTC_lag_corr.png>
 Package pdftex.def Info: BTC_lag_corr.png  used on input line 187.
@@ -1065,7 +1056,7 @@ Package pdftex.def Info: BTC_lag_corr.png  used on input line 187.
  [14
 
  <./BTC_lag_corr.png (PNG copy)>]
-<Unemployment.png, id=816, 696.35156pt x 439.6425pt>
+<Unemployment.png, id=425, 696.35156pt x 439.6425pt>
 File: Unemployment.png Graphic file (type png)
 <use Unemployment.png>
 Package pdftex.def Info: Unemployment.png  used on input line 195.
@@ -1073,7 +1064,7 @@ Package pdftex.def Info: Unemployment.png  used on input line 195.
  [15
 
  <./Unemployment.png>]
-<CPI_Growth.png, id=869, 838.13126pt x 441.65pt>
+<CPI_Growth.png, id=456, 838.13126pt x 441.65pt>
 File: CPI_Growth.png Graphic file (type png)
 <use CPI_Growth.png>
 Package pdftex.def Info: CPI_Growth.png  used on input line 203.
@@ -1081,7 +1072,7 @@ Package pdftex.def Info: CPI_Growth.png  used on input line 203.
  [16
 
  <./CPI_Growth.png>]
-<Federal_Funds_Rate.png, id=923, 696.35156pt x 439.6425pt>
+<Federal_Funds_Rate.png, id=486, 696.35156pt x 439.6425pt>
 File: Federal_Funds_Rate.png Graphic file (type png)
 <use Federal_Funds_Rate.png>
 Package pdftex.def Info: Federal_Funds_Rate.png  used on input line 211.
@@ -1090,7 +1081,7 @@ Package pdftex.def Info: Federal_Funds_Rate.png  used on input line 211.
 [17
 
  <./Federal_Funds_Rate.png>]
-<S&P_Quarterly.png, id=976, 696.35156pt x 439.6425pt>
+<S&P_Quarterly.png, id=516, 696.35156pt x 439.6425pt>
 File: S&P_Quarterly.png Graphic file (type png)
 <use S&P_Quarterly.png>
 Package pdftex.def Info: S&P_Quarterly.png  used on input line 219.
@@ -1098,7 +1089,7 @@ Package pdftex.def Info: S&P_Quarterly.png  used on input line 219.
  [18
 
  <./S&P_Quarterly.png>]
-<SP_Price.png, id=1030, 838.13126pt x 441.65pt>
+<SP_Price.png, id=546, 838.13126pt x 441.65pt>
 File: SP_Price.png Graphic file (type png)
 <use SP_Price.png>
 Package pdftex.def Info: SP_Price.png  used on input line 227.
@@ -1106,7 +1097,7 @@ Package pdftex.def Info: SP_Price.png  used on input line 227.
  [19
 
  <./SP_Price.png>]
-<SP_decom.png, id=1084, 838.13126pt x 386.44376pt>
+<SP_decom.png, id=578, 838.13126pt x 386.44376pt>
 File: SP_decom.png Graphic file (type png)
 <use SP_decom.png>
 Package pdftex.def Info: SP_decom.png  used on input line 235.
@@ -1129,7 +1120,7 @@ l.254 	\end{frame}
                    [22
 
 ]
-<Correlation_HM.png, id=1239, 838.13126pt x 441.65pt>
+<Correlation_HM.png, id=662, 838.13126pt x 441.65pt>
 File: Correlation_HM.png Graphic file (type png)
 <use Correlation_HM.png>
 Package pdftex.def Info: Correlation_HM.png  used on input line 262.
@@ -1138,39 +1129,45 @@ Package pdftex.def Info: Correlation_HM.png  used on input line 262.
 
  <./Correlation_HM.png>]
 \tf@nav=\write6
-\openout6 = `Presentation.nav'.
+\openout6 = `"LaTex new 16 Nisan.nav"'.
 
 \tf@toc=\write7
-\openout7 = `Presentation.toc'.
+\openout7 = `"LaTex new 16 Nisan.toc"'.
 
 \tf@snm=\write8
-\openout8 = `Presentation.snm'.
+\openout8 = `"LaTex new 16 Nisan.snm"'.
 
- (./Presentation.aux)
+ (./LaTex new 16 Nisan.aux)
 
-LaTeX Warning: There were multiply-defined labels.
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
-Package rerunfilecheck Info: File `Presentation.out' has not changed.
-(rerunfilecheck)             Checksum: 2F661F62AAA339DC3DFEE3C86994DA52;746.
+
+Package rerunfilecheck Warning: File `"LaTex new 16 Nisan".out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `"LaTex new 16 Nisan".out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  2F661F62AAA339DC3DFEE3C86994DA52;746.
  ) 
 Here is how much of TeX's memory you used:
- 25158 strings out of 476025
- 508436 string characters out of 5790017
- 1877388 words of memory out of 5000000
- 45045 multiletter control sequences out of 15000+600000
+ 25066 strings out of 476025
+ 507507 string characters out of 5790017
+ 1864388 words of memory out of 5000000
+ 44961 multiletter control sequences out of 15000+600000
  521932 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 128i,19n,122p,404b,771s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 128i,15n,122p,412b,561s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb
 ></usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb>
 </usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></
 usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></us
 r/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></u
 sr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb>
-Output written on Presentation.pdf (23 pages, 598303 bytes).
+Output written on "LaTex new 16 Nisan.pdf" (23 pages, 576815 bytes).
 PDF statistics:
- 1336 PDF objects out of 1440 (max. 8388607)
- 1230 compressed objects within 13 object streams
+ 735 PDF objects out of 1000 (max. 8388607)
+ 659 compressed objects within 7 object streams
  65 named destinations out of 1000 (max. 500000)
- 156 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 108 words of extra memory for PDF output out of 10000 (max. 10000000)
 

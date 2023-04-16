@@ -32,8 +32,13 @@ my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
                  strip.text = element_text(face = 'bold'))  
 #to resolve the local time issue:
 #Sys.setlocale("LC_TIME", "C")
+
 #Anil
 #df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+
+##Mert 
+#df <- read.csv(file= "/Users/mertbasaran/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv")
+#df_drivers <- read.csv(file = "/Users/mertbasaran/Documents/GitHub/csbtc/current.csv")
 
 #Elcin
 #df <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
@@ -167,8 +172,9 @@ ggplot(df_comp_long, aes(x = x, y = value)) +
   geom_line() +
   facet_wrap(~variable, scales = 'free', nrow = 3) +
   labs(x = 'Date', y = NULL) +
-  theme_bw()
-
+  theme_bw()+
+  ggtitle("Bitcoin Multiplicative Time Series Decomposition")
+  
 #Time series decomposition - S&P 500
 sp500_ts <- ts(df_drivers[order(df_drivers$Date),]$SP_500, start = c(2010,3), frequency = 4)
 decomp_sp500 <- decompose(sp500_ts, type = 'multiplicative')
@@ -188,7 +194,9 @@ ggplot(df_comp_long_sp500, aes(x = x, y = value)) +
   geom_line() +
   facet_wrap(~variable, scales = 'free', nrow = 3) +
   labs(x = 'Date', y = NULL) +
-  theme_bw()
+  theme_bw()+
+  ggtitle("S&P 500 Multiplicative Time Series Decomposition")
+
 #Other factors plots
 #S&P 500
 ggplot(df_drivers, aes(x=Date)) + 
