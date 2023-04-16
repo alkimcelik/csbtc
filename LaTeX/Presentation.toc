@@ -1,6 +1,0 @@
-\beamer@sectionintoc {1}{Introduction}{2}{0}{1}
-\beamer@sectionintoc {2}{Data}{3}{0}{2}
-\beamer@subsectionintoc {2}{1}{Data Recruitment}{3}{0}{2}
-\beamer@subsectionintoc {2}{2}{Dataset Properties}{4}{0}{2}
-\beamer@subsectionintoc {2}{3}{Data Operations}{5}{0}{2}
-\beamer@subsectionintoc {2}{4}{Data Visualisations}{8}{0}{2}
