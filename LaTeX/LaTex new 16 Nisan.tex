@@ -158,14 +158,6 @@ Deniz \textbf{Uygur}}
 		\end{figure}
 	\end{frame}
 	
-	\begin{frame}
-	\begin{figure}
-			\includegraphics[
-			width=0.75\textwidth]{BTC_Growth_2017}
-			\caption{Historical Quarterly Bitcoin Price Growth 2017-2023}
-			\label{fig:BTCpart1}
-		\end{figure}
-	\end{frame}
 	%\begin{frame}
 	%\begin{figure}
 	%		\includegraphics[
@@ -185,12 +177,26 @@ Deniz \textbf{Uygur}}
 	\end{frame}
        
         \begin{frame}
+	%mert
+	Sudden decrease in ACF, slow decrease in PACF, MA(2) looks suitable
+	\begin{columns}
+	\begin{column}{0.5\textwidth}
 	\begin{figure}
 			\includegraphics[
-			width=0.75\textwidth]{BTC_lag_corr}
-			\caption{BTC Lagged correlations}
-			\label{fig:BTCcorr}
+			width=1\textwidth]{acf}
+			\caption{ACF}
+			\label{fig:acf}
 		\end{figure}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+		\begin{figure}
+			\includegraphics[
+			width=1\textwidth]{pacf}
+			\caption{PACF}
+			\label{fig:pacf}
+		\end{figure}
+		\end{column}
+		\end{columns}
 	\end{frame}
 	\begin{frame}
 	\begin{figure}
@@ -240,16 +246,6 @@ Deniz \textbf{Uygur}}
 			width=0.75\textwidth]{SP_decom}
 			\caption{S\&P 500 Decomposition }
 			\label{fig:sPPP}
-		\end{figure}
-	\end{frame}
-
-	
-	\begin{frame}
-	\begin{figure}
-			\includegraphics[
-			width=0.75\textwidth]{Unemployment}
-			\caption{Quarterly Unemployment}
-			\label{fig:Unemp}
 		\end{figure}
 	\end{frame}
          \begin{frame}
