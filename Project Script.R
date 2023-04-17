@@ -23,7 +23,7 @@ change_func <- function(col1, col2){
 }
 my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
                  panel.background = element_rect(fill = 'white'),
-                 plot.title = element_text(hjust = .5, size = 28, colour = '#ffa500'),
+                 plot.title = element_text(hjust = .5, size = 12, colour = 'black'),
                  text = element_text(family = 'Georgia'),
                  axis.text = element_text(size = 10),
                  axis.title = element_text(size = 18, family = 'Georgia', face = 'bold'),
@@ -154,8 +154,8 @@ ggplot(combined_df_2017, aes(x = as.yearqtr(combined_df_2017$quarter, format = '
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
 #Time series decomposition - Bitcoin
-price_ts <- ts(df[order(df$Date),]$Price, start = c(2010,7), frequency = 365)
-decomp <- decompose(price_ts, type = 'multiplicative')
+price_ts <- ts(df_price_quarterly[order(combined_df$quarter),]$change, start = c(2010,3), frequency = 4)
+decomp <- decompose(price_ts, type = 'additive')
 
 df_decomp <- data.frame(
   x = time(price_ts),
@@ -173,8 +173,33 @@ ggplot(df_comp_long, aes(x = x, y = value)) +
   facet_wrap(~variable, scales = 'free', nrow = 3) +
   labs(x = 'Date', y = NULL) +
   theme_bw()+
-  ggtitle("Bitcoin Multiplicative Time Series Decomposition")
-  
+  ggtitle("Bitcoin Growth Additive Time Series Decomposition")
+
+#Bitcoin Growth Acf Plot
+acf_result <- acf(df_decomp$random, na.action = na.pass)
+
+
+acf_df <- data.frame(lag = acf_result$lag, acf = acf_result$acf)
+
+ggplot(acf_df, aes(x = lag*4, y = acf)) +
+  geom_bar(stat = "identity", width = 0.3) +
+  geom_hline(yintercept = c(-1.96/sqrt(length(df_decomp$random)), 1.96/sqrt(length(df_decomp$random))), linetype = "dashed") +
+  xlab("Lag") +
+  ylab("Autocorrelation") +
+  ggtitle("Bitcoin Growth ACF Plot")  
+
+#Pacf plot
+pacf_result <- pacf(df_decomp$random, na.action = na.pass)
+
+pacf_df <- data.frame(lag = pacf_result$lag, pacf = pacf_result$acf)
+
+ggplot(pacf_df, aes(x = lag*4, y = pacf)) +
+  geom_bar(stat = "identity", width = 0.3) +
+  geom_hline(yintercept = c(-1.96/sqrt(length(df_decomp$random)), 1.96/sqrt(length(df_decomp$random))), linetype = "dashed") +
+  xlab("Lag") +
+  ylab("Partial Autocorrelation") +
+  ggtitle("Bitcoin Growth PACF Plot")
+
 #Time series decomposition - S&P 500
 sp500_ts <- ts(df_drivers[order(df_drivers$Date),]$SP_500, start = c(2010,3), frequency = 4)
 decomp_sp500 <- decompose(sp500_ts, type = 'multiplicative')
