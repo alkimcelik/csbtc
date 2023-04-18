@@ -31,21 +31,22 @@ my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
                  strip.background = element_rect(colour = "black", fill = "white"),
                  strip.text = element_text(face = 'bold'))  
 #to resolve the local time issue:
-#Sys.setlocale("LC_TIME", "C")
+Sys.setlocale("LC_TIME", "C")
 
 #Anil
-#df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-
+df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
 ##Mert 
 #df <- read.csv(file= "/Users/mertbasaran/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv")
 #df_drivers <- read.csv(file = "/Users/mertbasaran/Documents/GitHub/csbtc/current.csv")
 
 #Elcin
 #df <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+#df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
 
 #Alkim
-df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
+#df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+#df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
 
 
 #########Data Manipulation########
@@ -303,13 +304,21 @@ ggplot(data = correlation, aes(x = Var2, y = Var1, fill = value)) +
         axis.title.y = element_blank(),
         panel.background = element_blank()) +
   ggtitle('Correlation Heatmap')
-  
 
-#########Potential Drivers########
-#Anil
-#df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
-#Elcin
-#df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
+#part_C  
+
+ts_data <- ts(combined_df$change, start = c(2010,3), frequency = 4)
+forecasts <- list()
+forecasts[1] <- 0
+for (i in 2:length(ts_data)){
+  train_df <- ts_data[1:i]
+  ar1_model <- arima(train_df, order = c(1,0,0))
+  forecasts[i] <- forecast(ar1_model,h=1)
+}
+plot(forecasts) 
+
+ggplot()
+
 
 
 
