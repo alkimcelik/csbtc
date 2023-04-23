@@ -13,10 +13,13 @@ library(tidyr)
 library(scales)
 library(reshape2)
 library(psych)
+library(vars)
+library(lmtest)
 
 conflict_prefer('select', 'dplyr')
 conflict_prefer('filter', 'dplyr')
 conflict_prefer('lag', 'dplyr')
+conflict_prefer('melt', 'reshape2')
 change_func <- function(col1, col2){
   change <- ((col1 - col2)/col2)*100
   return(change)
@@ -34,8 +37,8 @@ my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
 Sys.setlocale("LC_TIME", "C")
 
 #Anil
-df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
+#df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+#df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
 ##Mert 
 #df <- read.csv(file= "/Users/mertbasaran/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv")
 #df_drivers <- read.csv(file = "/Users/mertbasaran/Documents/GitHub/csbtc/current.csv")
@@ -45,8 +48,8 @@ df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
 #df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
 
 #Alkim
-#df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-#df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
+df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
 
 
 #########Data Manipulation########
@@ -107,7 +110,8 @@ df_drivers <- cbind(df_drivers,df_price_quarterly$quarter)
 
 
 combined_df <- cbind(df_price_quarterly,df_drivers[,-c(1,ncol(df_drivers))])
-combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
+#combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
+combined_df <- combined_df[-c(1:11),]
 
 
 plot(x = as.yearqtr(df_price_quarterly$quarter, format = '%Y Q%q'), y = df_price_quarterly$price, type = 'l')
@@ -305,22 +309,115 @@ ggplot(data = correlation, aes(x = Var2, y = Var1, fill = value)) +
         panel.background = element_blank()) +
   ggtitle('Correlation Heatmap')
 
+
 #part_C  
-
-ts_data <- ts(combined_df$change, start = c(2010,3), frequency = 4)
-forecasts <- list()
-forecasts[1] <- 0
-for (i in 2:length(ts_data)){
+#Growth ratelerde stationarity testi yapip stationary hale getirecek miyiz
+ts_data <- ts(combined_df$change, start = c(2013,2), frequency = 4)
+forecasts_ar <- list()
+forecasts_ar[1:2] <- NA
+for (i in 2:(length(ts_data)-1)){
   train_df <- ts_data[1:i]
-  ar1_model <- arima(train_df, order = c(1,0,0))
-  forecasts[i] <- forecast(ar1_model,h=1)
+  ar1_model <- ar(train_df, order = 1)
+  forecasts_ar[i+1] <- forecast(ar1_model,h=1)$mean
 }
-plot(forecasts) 
 
-ggplot()
+forecasts_ar <- unlist(forecasts_ar)
+forecasts_with_realized <- cbind(combined_df %>% select(quarter, change), forecasts_ar)
+forecasts_with_realized_long <- melt(forecasts_with_realized, 
+     id.vars = c('quarter'))
+forecasts_with_realized_long$quarter <- as.yearqtr(forecasts_with_realized_long$quarter, format = "%Y Q%q")
+
+ggplot(forecasts_with_realized_long, aes(x=quarter)) + 
+  geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
+  geom_point(aes(y = value/100, color = variable)) + 
+  scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00"), labels = c('Actual', 'Forecasted')) + # Add color legend with blue and orange colors
+  ylab('Growth Rate') + xlab('Quarters') +
+  scale_x_yearqtr(breaks = seq(min(as.yearqtr(forecasts_with_realized_long$quarter)), 
+                               max(as.yearqtr(forecasts_with_realized_long$quarter)), 
+                               by = 1),
+                  labels = function(x) format(x, "%Y Q%q"),
+                  expand = c(0, 0)) +
+  ggtitle('Actual vs. Forecasted Growth Rate in AR(1) Model') +
+  scale_y_continuous(labels = scales::percent_format())
+
+forecasts_with_realized_extracted <- forecasts_with_realized[-c(1:2),]
+RMSE_AR <- mean((forecasts_with_realized_extracted$change - forecasts_with_realized_extracted$forecasts_ar)**2)**0.5
+
+#part d
+var_data <- combined_df %>% select(change, Unemp_Rate, CPILFESL, Fed_Funds, SP_500_change)
+forecasts_var <- list()
+forecasts_var[1:3] <- NA
+for (i in 3:(nrow(var_data)-1)){
+  train_df <- var_data[1:i,]
+  var_model <- VAR(train_df, p = 1, type = 'none')
+  forecasts_var[i+1] <- predict(var_model,n.ahead=1)$fcst$change[1]
+}
+forecasts_var <- unlist(forecasts_var)
 
 
+forecasts_with_realized_with_var <- cbind(combined_df %>% select(quarter, change), forecasts_ar,forecasts_var )
+forecasts_with_realized_with_var_long <- melt(forecasts_with_realized_with_var, 
+                                     id.vars = c('quarter'))
+forecasts_with_realized_with_var_long$quarter <- as.yearqtr(forecasts_with_realized_with_var_long$quarter, format = "%Y Q%q")
 
+ggplot(forecasts_with_realized_with_var_long, aes(x=quarter)) + 
+  geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
+  geom_point(aes(y = value/100, color = variable)) + 
+  scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00", "red"), labels = c('Actual', 'AR Forecasted', 'VAR Forecasted')) + # Add color legend with blue and orange colors
+  ylab('Growth Rate') + xlab('Quarters') +
+  scale_x_yearqtr(breaks = seq(min(as.yearqtr(forecasts_with_realized_with_var_long$quarter)), 
+                               max(as.yearqtr(forecasts_with_realized_with_var_long$quarter)), 
+                               by = 1),
+                  labels = function(x) format(x, "%Y Q%q"),
+                  expand = c(0, 0)) +
+  ggtitle('Actual vs. Forecasted Growth Rates in AR(1) and VAR(1) Model') +
+  scale_y_continuous(labels = scales::percent_format())
 
+forecasts_with_realized_with_var_extracted <- forecasts_with_realized_with_var[-c(1:7),]
+RMSE_AR_VAR <- mean((forecasts_with_realized_with_var_extracted$change - forecasts_with_realized_with_var_extracted$forecasts_var)**2)**0.5
 
+#part e
+grangertest(change ~ Unemp_Rate , order = 1, data = var_data)
+grangertest(change ~ CPILFESL  , order = 1, data = var_data)
+grangertest(change ~ Fed_Funds  , order = 1, data = var_data)
+grangertest(change ~ SP_500_change , order = 1, data = var_data)
+var_model <- VAR(var_data, p = 1, type = 'none')
+print(causality(var_model, cause = 'change')$Granger)
+
+#part f
+lags <- 1:3
+optimal_lag <- VARselect(var_data, lag.max = 3, type = 'none')$selection['AIC(n)']
+forecasts_var3 <- list()
+aic3 <- list()
+forecasts_var3[1:5] <- NA
+for (i in 5:(nrow(var_data)-1)){
+  train_df <- var_data[1:i,]
+  var_model <- VAR(train_df, p = optimal_lag, type = 'none')
+  forecasts_var3 <- c(forecasts_var3,predict(var_model,n.ahead=1)$fcst$change[1])
+}
+
+forecasts_var3 <- unlist(forecasts_var3)
+
+forecasts_with_realized_with_var_3 <- cbind(combined_df %>% select(quarter, change), forecasts_ar,forecasts_var, forecasts_var3)
+forecasts_with_realized_with_var_3_long <- melt(forecasts_with_realized_with_var_3, 
+                                              id.vars = c('quarter'))
+forecasts_with_realized_with_var_3_long$quarter <- as.yearqtr(forecasts_with_realized_with_var_3_long$quarter, format = "%Y Q%q")
+
+ggplot(forecasts_with_realized_with_var_3_long, aes(x=quarter)) + 
+  geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
+  geom_point(aes(y = value/100, color = variable)) + 
+  scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00", "red", 'darkgreen'), labels = c('Actual', 'AR(1)', 'VAR(1)','VAR(3)')) + # Add color legend with blue and orange colors
+  ylab('Growth Rate') + xlab('Quarters') +
+  scale_x_yearqtr(breaks = seq(min(as.yearqtr(forecasts_with_realized_with_var_3_long$quarter)), 
+                               max(as.yearqtr(forecasts_with_realized_with_var_3_long$quarter)), 
+                               by = 1),
+                  labels = function(x) format(x, "%Y Q%q"),
+                  expand = c(0, 0)) +
+  ggtitle('Actual vs. Forecasted Growth Rates in AR(1), VAR(1), and VAR(3) Models') +
+  scale_y_continuous(labels = scales::percent_format())
+
+forecasts_with_realized_with_var_3_extracted <- forecasts_with_realized_with_var_3[-c(1:18),]
+RMSE_VAR3 <- mean((forecasts_with_realized_with_var_3_extracted$change - forecasts_with_realized_with_var_3_extracted$forecasts_var3)**2)**0.5
+
+#part h
 
