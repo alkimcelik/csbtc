@@ -37,15 +37,15 @@ my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
 Sys.setlocale("LC_TIME", "C")
 
 #Anil
-df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
+#df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+#df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
 ##Mert 
 #df <- read.csv(file= "/Users/mertbasaran/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv")
 #df_drivers <- read.csv(file = "/Users/mertbasaran/Documents/GitHub/csbtc/current.csv")
 
 #Elcin
-#df <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-#df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
+df <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
 
 #Alkim
 #df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
@@ -105,7 +105,7 @@ df_drivers$CPIAUCSL_lag <- lag(df_drivers$CPIAUCSL)
 df_drivers$CPIAUCSL_change <- change_func(df_drivers$CPIAUCSL, df_drivers$CPIAUCSL_lag)
 df_drivers$CPILFESL_lag <- lag(df_drivers$CPILFESL)
 df_drivers$CPILFESL_change <- change_func(df_drivers$CPILFESL, df_drivers$CPILFESL_lag)
-df_price_quarterly <- df_price_quarterly[-1]
+#df_price_quarterly <- df_price_quarterly[-1]
 df_drivers <- cbind(df_drivers,df_price_quarterly$quarter)
 
 
@@ -421,10 +421,10 @@ forecasts_with_realized_with_var_3_extracted <- forecasts_with_realized_with_var
 RMSE_VAR3 <- mean((forecasts_with_realized_with_var_3_extracted$change - forecasts_with_realized_with_var_3_extracted$forecasts_var3)**2)**0.5
 
 #part h
-#Anil
-
 df$month <- paste(mondate::year(df$Date),mondate::month(df$Date))
 df_price_monthly <- df %>% group_by(month) %>% summarise(price = mean(Price))
+
+
 
 df_price_monthly <- df %>%
   group_by(month = format(Date, "%Y-%m")) %>%
@@ -442,8 +442,11 @@ df_price_monthly$change <- na.fill(df_price_monthly$change, 0)
 
 
 
+#Anil
+#df_drivers_monthly <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current_monthly.csv')
+#Elcin
+df_drivers_monthly <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current_monthly.csv')
 
-df_drivers_monthly <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current_monthly.csv')
 
 df_drivers_monthly <- df_drivers_monthly %>% select(c('sasdate','UNRATE','CPIAUCSL', 'FEDFUNDS', 
                                       'S.P.500', 'S.P..indust', 'S.P.div.yield',
@@ -469,3 +472,6 @@ df_drivers_monthly <- cbind(df_drivers_monthly,df_price_monthly$month)
 combined_df_monthly <- cbind(df_price_monthly,df_drivers_monthly[,-c(1,ncol(df_drivers_monthly))])
 #combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
 combined_df_monthly <- combined_df_monthly[-c(1:31),]
+
+
+library('midasr')
