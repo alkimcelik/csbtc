@@ -37,8 +37,8 @@ my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
 Sys.setlocale("LC_TIME", "C")
 
 #Anil
-#df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-#df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
+df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
 ##Mert 
 #df <- read.csv(file= "/Users/mertbasaran/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv")
 #df_drivers <- read.csv(file = "/Users/mertbasaran/Documents/GitHub/csbtc/current.csv")
@@ -48,8 +48,8 @@ Sys.setlocale("LC_TIME", "C")
 #df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
 
 #Alkim
-df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
+#df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+#df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
 
 
 #########Data Manipulation########
@@ -87,7 +87,7 @@ df_price_quarterly$change <- change_func(df_price_quarterly$price, df_price_quar
 df_price_quarterly = df_price_quarterly[-c(52),] #last quarter not finished
 df_price_quarterly$lag <- na.fill(df_price_quarterly$lag, 0)
 df_price_quarterly$change <- na.fill(df_price_quarterly$change, 0)
-
+df_price_quarterly <- df_price_quarterly[-nrow(df_price_quarterly),]
 
 df_drivers <- df_drivers %>% select(c('sasdate','UNRATE','CPIAUCSL', 'CPILFESL', 'FEDFUNDS', 
                                       'S.P.500', 'S.P..indust', 'S.P.div.yield',
@@ -96,7 +96,7 @@ colnames(df_drivers) <- c('Date', 'Unemp_Rate', 'CPIAUCSL', 'CPILFESL', 'Fed_Fun
                           'SP_500', 'SP_Industrial', 'SP_Dividend_Yield', 'SP_PE_Ratio')
 df_drivers = df_drivers[-c(1,2),]
 df_drivers$Date <- as.Date(df_drivers$Date, format = "%m/%d/%Y") 
-df_drivers <- df_drivers %>% filter (df_drivers$Date >= "2010-06-01")
+df_drivers <- df_drivers %>% filter (df_drivers$Date >= "2010-09-01")
 df_drivers$lag_unrate <- lag(df_drivers$Unemp_Rate)
 df_drivers$unrate_change <- change_func(df_drivers$Unemp_Rate, df_drivers$lag_unrate)
 df_drivers$SP_500_lag <- lag(df_drivers$SP_500)
@@ -105,6 +105,7 @@ df_drivers$CPIAUCSL_lag <- lag(df_drivers$CPIAUCSL)
 df_drivers$CPIAUCSL_change <- change_func(df_drivers$CPIAUCSL, df_drivers$CPIAUCSL_lag)
 df_drivers$CPILFESL_lag <- lag(df_drivers$CPILFESL)
 df_drivers$CPILFESL_change <- change_func(df_drivers$CPILFESL, df_drivers$CPILFESL_lag)
+df_price_quarterly <- df_price_quarterly[-1]
 df_drivers <- cbind(df_drivers,df_price_quarterly$quarter)
 
 
@@ -420,4 +421,51 @@ forecasts_with_realized_with_var_3_extracted <- forecasts_with_realized_with_var
 RMSE_VAR3 <- mean((forecasts_with_realized_with_var_3_extracted$change - forecasts_with_realized_with_var_3_extracted$forecasts_var3)**2)**0.5
 
 #part h
+#Anil
 
+df$month <- paste(mondate::year(df$Date),mondate::month(df$Date))
+df_price_monthly <- df %>% group_by(month) %>% summarise(price = mean(Price))
+
+df_price_monthly <- df %>%
+  group_by(month = format(Date, "%Y-%m")) %>%
+  summarize(price = mean(Price))
+
+df_price_monthly <- df_price_monthly[-c((nrow(df_price_monthly)-3):nrow(df_price_monthly)),]
+df_price_monthly <- df_price_monthly[-c(1:2),]
+
+df_price_monthly$lag <- lag(df_price_monthly$price)
+df_price_monthly$change <- change_func(df_price_monthly$price, df_price_monthly$lag)
+#df_price_monthly = df_price_monthly[-c(52),] #last quarter not finished
+df_price_monthly$lag <- na.fill(df_price_monthly$lag, 0)
+df_price_monthly$change <- na.fill(df_price_monthly$change, 0)
+
+
+
+
+
+df_drivers_monthly <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current_monthly.csv')
+
+df_drivers_monthly <- df_drivers_monthly %>% select(c('sasdate','UNRATE','CPIAUCSL', 'FEDFUNDS', 
+                                      'S.P.500', 'S.P..indust', 'S.P.div.yield',
+                                      'S.P.PE.ratio')) 
+colnames(df_drivers_monthly) <- c('Date', 'Unemp_Rate', 'CPIAUCSL', 'Fed_Funds',
+                          'SP_500', 'SP_Industrial', 'SP_Dividend_Yield', 'SP_PE_Ratio')
+df_drivers_monthly = df_drivers_monthly[-1,]
+df_drivers_monthly$Date <- as.Date(df_drivers_monthly$Date, format = "%m/%d/%Y") 
+df_drivers_monthly <- df_drivers_monthly %>% filter (df_drivers_monthly$Date >= "2010-09-01")
+df_drivers_monthly$lag_unrate <- lag(df_drivers_monthly$Unemp_Rate)
+df_drivers_monthly$unrate_change <- change_func(df_drivers_monthly$Unemp_Rate, df_drivers_monthly$lag_unrate)
+df_drivers_monthly$SP_500_lag <- lag(df_drivers_monthly$SP_500)
+df_drivers_monthly$SP_500_change <- change_func(df_drivers_monthly$SP_500, df_drivers_monthly$SP_500_lag)
+df_drivers_monthly$CPIAUCSL_lag <- lag(df_drivers_monthly$CPIAUCSL)
+df_drivers_monthly$CPIAUCSL_change <- change_func(df_drivers_monthly$CPIAUCSL, df_drivers_monthly$CPIAUCSL_lag)
+#df_drivers_monthly$CPILFESL_lag <- lag(df_drivers_monthly$CPILFESL)
+#df_drivers_monthly$CPILFESL_change <- change_func(df_drivers_monthly$CPILFESL, df_drivers_monthly$CPILFESL_lag)
+df_drivers_monthly <- df_drivers_monthly[-c((nrow(df_drivers_monthly)-1):nrow(df_drivers_monthly)),]
+df_drivers_monthly <- cbind(df_drivers_monthly,df_price_monthly$month)
+
+
+
+combined_df_monthly <- cbind(df_price_monthly,df_drivers_monthly[,-c(1,ncol(df_drivers_monthly))])
+#combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
+combined_df_monthly <- combined_df_monthly[-c(1:31),]
