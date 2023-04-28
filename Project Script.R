@@ -37,15 +37,15 @@ my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
 Sys.setlocale("LC_TIME", "C")
 
 #Anil
-#df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-#df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
+df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
 ##Mert 
 #df <- read.csv(file= "/Users/mertbasaran/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv")
 #df_drivers <- read.csv(file = "/Users/mertbasaran/Documents/GitHub/csbtc/current.csv")
 
 #Elcin
-df <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
+#df <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+#df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
 
 #Alkim
 #df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
@@ -443,9 +443,9 @@ df_price_monthly$change <- na.fill(df_price_monthly$change, 0)
 
 
 #Anil
-#df_drivers_monthly <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current_monthly.csv')
+df_drivers_monthly <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current_monthly.csv')
 #Elcin
-df_drivers_monthly <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current_monthly.csv')
+#df_drivers_monthly <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current_monthly.csv')
 
 
 df_drivers_monthly <- df_drivers_monthly %>% select(c('sasdate','UNRATE','CPIAUCSL', 'FEDFUNDS', 
@@ -473,5 +473,72 @@ combined_df_monthly <- cbind(df_price_monthly,df_drivers_monthly[,-c(1,ncol(df_d
 #combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
 combined_df_monthly <- combined_df_monthly[-c(1:31),]
 
+install.packages("midasr")
+library(midasr)
+df_midas <- combined_df_monthly[c('change','Unemp_Rate','CPIAUCSL_change','Fed_Funds','SP_500_change')]
+model_midas <- midas_r(change ~ 1 + L(1:3, "change") + L(1:3, "Unemp_Rate") + L(1:3, "CPIAUCSL_change") + L(1:3, "Fed_Funds") +L(1:3, "SP_500_change"))
 
-library('midasr')
+
+
+
+t <- nrow(df_drivers)  # number of full quarters in the sample
+T <- nrow(df_drivers_monthly)
+K <- 3
+X_Unemp_Rate <- data.frame()
+X_CPIAUCSL_change <- data.frame()
+X_Fed_Funds <- data.frame()
+X_SP_500_change <- data.frame()
+autoreg_y <- data.frame()
+for (i in 1:t){
+  for (j in 1:3){
+    if (3*i-j <1) {
+    X_Unemp_Rate[i,j] <- 0
+    X_CPIAUCSL_change[i,j] <- 0
+    X_Fed_Funds[i,j] <- 0
+    X_SP_500_change[i,j] <- 0
+    }
+    else if (3*i-j>T) {
+    X_Unemp_Rate[i,j] <- 0
+    X_CPIAUCSL_change[i,j] <- 0
+    X_Fed_Funds[i,j] <- 0
+    X_SP_500_change[i,j] <- 0
+    }
+    else {
+    X_Unemp_Rate[i,j] <- df_drivers_monthly$Unemp_Rate[3*i-j]
+    X_CPIAUCSL_change[i,j] <- df_drivers_monthly$CPIAUCSL_change[3*i-j]
+    X_Fed_Funds[i,j] <- df_drivers_monthly$Fed_Funds[3*i-j]
+    X_SP_500_change[i,j] <- df_drivers_monthly$SP_500_change[3*i-j]
+    }
+    if (i-1 < 1) {
+      autoreg_y[i,1] <- 0
+    }
+      else {
+      autoreg_y[i,1] <- df_price_quarterly$change[i-1]
+      }
+  }
+}
+X_Unemp_Rate[is.na(X_Unemp_Rate)] <- 0
+X_CPIAUCSL_change[is.na(X_CPIAUCSL_change)] <- 0
+X_Fed_Funds[is.na(X_Fed_Funds)] <- 0
+X_SP_500_change[is.na(X_SP_500_change)] <- 0
+
+
+regressor_X <- data.frame(autoreg_y,X_Unemp_Rate,X_CPIAUCSL_change,X_Fed_Funds,X_SP_500_change,autoreg_y)
+regressor_X <- as.matrix(regressor_X)
+fit_Y <- as.matrix(df_price_quarterly$change)
+model_midas <- lm(fit_Y~regressor_X)
+#predictions <- predict(model_midas)
+
+df_temp <- data.frame(df_price_quarterly$quarter,df_price_quarterly$change,model_midas$fitted.values)
+colnames(df_temp) <- c("quarter","change","fitted_values")
+df_temp_melted <- melt(df_temp, id.vars = "quarter")
+
+ggplot(df_temp,aes(x=quarter)) +
+  geom_line(aes(y=change, color="blue")) +
+  geom_line(aes(y=fitted_values,color="red"))
+labs(x = 'Date', y = NULL)
+
+plot(df_temp$change, typle="l")
+plot(df_temp$fitted_values,type="l")
+
+
