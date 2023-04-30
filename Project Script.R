@@ -24,6 +24,12 @@ change_func <- function(col1, col2){
   change <- ((col1 - col2)/col2)*100
   return(change)
 }
+calc_AIC <- function(model){
+  n <- length(model$residuals)
+  k <- length(coef(model))
+  AIC <- n*log(sum(model$residuals^2)/n) + 2*k
+  return(AIC)
+}
 my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
                  panel.background = element_rect(fill = 'white'),
                  plot.title = element_text(hjust = .5, size = 12, colour = 'black'),
@@ -441,7 +447,8 @@ df_price_monthly$change <- na.fill(df_price_monthly$change, 0)
 df_drivers_monthly <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current_monthly.csv')
 #Elcin
 #df_drivers_monthly <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current_monthly.csv')
-
+#Alkim
+df_drivers_monthly <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current_monthly.csv')
 df_drivers_monthly <- df_drivers_monthly %>% select(c('sasdate','UNRATE','CPIAUCSL', 'FEDFUNDS', 
                                       'S.P.500', 'S.P..indust', 'S.P.div.yield',
                                       'S.P.PE.ratio')) 
@@ -514,7 +521,7 @@ colnames(midas_data) <- c("response","autoreg_y","X_Unemp_Rate_2","X_Unemp_Rate_
 
 model_midas <- lm(midas_data$response~.,data=midas_data)
 #predictions <- predict(model_midas)
-
+calc_AIC(model_midas)
 plot_df <- cbind(df_price_quarterly %>% select(quarter, change),model_midas$fitted.values)
 colnames(plot_df)<-c("Quarter","Actual","Fitted")
 plot_df$Quarter <- as.yearqtr(plot_df$Quarter, format = "%Y Q%q")
