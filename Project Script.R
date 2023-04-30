@@ -93,7 +93,7 @@ df_price_quarterly$change <- change_func(df_price_quarterly$price, df_price_quar
 df_price_quarterly = df_price_quarterly[-c(52),] #last quarter not finished
 df_price_quarterly$lag <- na.fill(df_price_quarterly$lag, 0)
 df_price_quarterly$change <- na.fill(df_price_quarterly$change, 0)
-df_price_quarterly <- df_price_quarterly[-nrow(df_price_quarterly),]
+df_price_quarterly_without_2023_q1 <- df_price_quarterly[-nrow(df_price_quarterly),]
 
 df_drivers <- df_drivers %>% select(c('sasdate','UNRATE','CPIAUCSL', 'CPILFESL', 'FEDFUNDS', 
                                       'S.P.500', 'S.P..indust', 'S.P.div.yield',
@@ -112,16 +112,16 @@ df_drivers$CPIAUCSL_change <- change_func(df_drivers$CPIAUCSL, df_drivers$CPIAUC
 df_drivers$CPILFESL_lag <- lag(df_drivers$CPILFESL)
 df_drivers$CPILFESL_change <- change_func(df_drivers$CPILFESL, df_drivers$CPILFESL_lag)
 #df_price_quarterly <- df_price_quarterly[-1]
-df_drivers <- cbind(df_drivers,df_price_quarterly$quarter)
+df_drivers <- cbind(df_drivers,df_price_quarterly_without_2023_q1$quarter)
 
 
 
-combined_df <- cbind(df_price_quarterly,df_drivers[,-c(1,ncol(df_drivers))])
+combined_df <- cbind(df_price_quarterly_without_2023_q1,df_drivers[,-c(1,ncol(df_drivers))])
 #combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
 combined_df <- combined_df[-c(1:11),]
 
 
-plot(x = as.yearqtr(df_price_quarterly$quarter, format = '%Y Q%q'), y = df_price_quarterly$price, type = 'l')
+plot(x = as.yearqtr(df_price_quarterly_without_2023_q1$quarter, format = '%Y Q%q'), y = df_price_quarterly_without_2023_q1$price, type = 'l')
 
 #######PLOTTING#######
 plot.new()
@@ -150,7 +150,7 @@ ggplot(combined_df, aes(x = as.yearqtr(combined_df$quarter, format = '%Y Q%q')))
                   expand = c(0, 0)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
-combined_df_2017 <- combined_df %>% filter(as.yearqtr(df_price_quarterly$quarter, format = '%Y Q%q') >= '2017 Q1')
+combined_df_2017 <- combined_df %>% filter(as.yearqtr(df_price_quarterly_without_2023_q1$quarter, format = '%Y Q%q') >= '2017 Q1')
 
 ggplot(combined_df_2017, aes(x = as.yearqtr(combined_df_2017$quarter, format = '%Y Q%q'))) +
   geom_line(aes(y = change/100),color = 'darkgreen', linewidth = 1) + 
@@ -166,7 +166,7 @@ ggplot(combined_df_2017, aes(x = as.yearqtr(combined_df_2017$quarter, format = '
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
 #Time series decomposition - Bitcoin
-price_ts <- ts(df_price_quarterly[order(combined_df$quarter),]$change, start = c(2010,3), frequency = 4)
+price_ts <- ts(df_price_quarterly_without_2023_q1[order(combined_df$quarter),]$change, start = c(2010,3), frequency = 4)
 decomp <- decompose(price_ts, type = 'additive')
 
 df_decomp <- data.frame(
@@ -448,7 +448,7 @@ df_drivers_monthly <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/curre
 #Elcin
 #df_drivers_monthly <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current_monthly.csv')
 #Alkim
-df_drivers_monthly <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current_monthly.csv')
+#df_drivers_monthly <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current_monthly.csv')
 df_drivers_monthly <- df_drivers_monthly %>% select(c('sasdate','UNRATE','CPIAUCSL', 'FEDFUNDS', 
                                       'S.P.500', 'S.P..indust', 'S.P.div.yield',
                                       'S.P.PE.ratio')) 
@@ -456,72 +456,127 @@ colnames(df_drivers_monthly) <- c('Date', 'Unemp_Rate', 'CPIAUCSL', 'Fed_Funds',
                           'SP_500', 'SP_Industrial', 'SP_Dividend_Yield', 'SP_PE_Ratio')
 df_drivers_monthly = df_drivers_monthly[-1,]
 df_drivers_monthly$Date <- as.Date(df_drivers_monthly$Date, format = "%m/%d/%Y") 
-df_drivers_monthly <- df_drivers_monthly %>% filter (df_drivers_monthly$Date >= "2010-09-01")
+df_drivers_monthly <- df_drivers_monthly %>% filter (df_drivers_monthly$Date >= "2013-02-01")
 df_drivers_monthly$lag_unrate <- lag(df_drivers_monthly$Unemp_Rate)
 df_drivers_monthly$unrate_change <- change_func(df_drivers_monthly$Unemp_Rate, df_drivers_monthly$lag_unrate)
 df_drivers_monthly$SP_500_lag <- lag(df_drivers_monthly$SP_500)
 df_drivers_monthly$SP_500_change <- change_func(df_drivers_monthly$SP_500, df_drivers_monthly$SP_500_lag)
 df_drivers_monthly$CPIAUCSL_lag <- lag(df_drivers_monthly$CPIAUCSL)
 df_drivers_monthly$CPIAUCSL_change <- change_func(df_drivers_monthly$CPIAUCSL, df_drivers_monthly$CPIAUCSL_lag)
+df_drivers_monthly$monthnum <- mondate::month(df_drivers_monthly$Date)
 #df_drivers_monthly$CPILFESL_lag <- lag(df_drivers_monthly$CPILFESL)
 #df_drivers_monthly$CPILFESL_change <- change_func(df_drivers_monthly$CPILFESL, df_drivers_monthly$CPILFESL_lag)
-df_drivers_monthly <- df_drivers_monthly[-c((nrow(df_drivers_monthly)-1):nrow(df_drivers_monthly)),]
-df_drivers_monthly <- cbind(df_drivers_monthly,df_price_monthly$month)
-combined_df_monthly <- cbind(df_price_monthly,df_drivers_monthly[,-c(1,ncol(df_drivers_monthly))])
+#df_drivers_monthly <- df_drivers_monthly[-c((nrow(df_drivers_monthly)-1):nrow(df_drivers_monthly)),]
+#df_drivers_monthly <- cbind(df_drivers_monthly,df_price_monthly$month)
+#combined_df_monthly <- cbind(df_price_monthly,df_drivers_monthly[,-c(1,ncol(df_drivers_monthly))])
 #combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
-combined_df_monthly <- combined_df_monthly[-c(1:31),]
+#combined_df_monthly <- combined_df_monthly[-c(1:31),]
 
 #Part h
 t <- nrow(df_drivers)  # number of full quarters in the sample
 #T <- nrow(df_drivers_monthly)
 #K <- 3
-X_Unemp_Rate <- data.frame()
-X_CPIAUCSL_change <- data.frame()
-X_Fed_Funds <- data.frame()
-X_SP_500_change <- data.frame()
-autoreg_y <- data.frame()
-for (i in 1:t){
-  for (j in 1:3){
-    if (3*i-j <1) {
-    X_Unemp_Rate[i,j] <- 0
-    X_CPIAUCSL_change[i,j] <- 0
-    X_Fed_Funds[i,j] <- 0
-    X_SP_500_change[i,j] <- 0
-    }
-    else if (3*i-j>T) {
-    X_Unemp_Rate[i,j] <- 0
-    X_CPIAUCSL_change[i,j] <- 0
-    X_Fed_Funds[i,j] <- 0
-    X_SP_500_change[i,j] <- 0
-    }
-    else {
-    X_Unemp_Rate[i,j] <- df_drivers_monthly$Unemp_Rate[3*i-j]
-    X_CPIAUCSL_change[i,j] <- df_drivers_monthly$CPIAUCSL_change[3*i-j]
-    X_Fed_Funds[i,j] <- df_drivers_monthly$Fed_Funds[3*i-j]
-    X_SP_500_change[i,j] <- df_drivers_monthly$SP_500_change[3*i-j]
-    }
-    if (i-1 < 1) {
-      autoreg_y[i,1] <- 0
-    }
-      else {
-      autoreg_y[i,1] <- df_price_quarterly$change[i-1]
-      }
-  }
+df_drivers_monthly_selected <- df_drivers_monthly %>% select(Date, Unemp_Rate, CPIAUCSL_change, Fed_Funds, SP_500_change, monthnum)
+X2 <- df_drivers_monthly_selected %>% filter(monthnum %in% c(2,5,8,11))
+X2 <- X2[-1,]
+X2 <- X2 %>% select(Unemp_Rate, CPIAUCSL_change, Fed_Funds, SP_500_change)
+X1 <- df_drivers_monthly_selected %>% filter(monthnum %in% c(1,4,7,10))
+X1 <- X1 %>% select(Unemp_Rate, CPIAUCSL_change, Fed_Funds, SP_500_change)
+X0 <- df_drivers_monthly_selected %>% filter(monthnum %in% c(3,6,9,12))
+X0 <- X0 %>% select(Unemp_Rate, CPIAUCSL_change, Fed_Funds, SP_500_change)
+X_1 <- df_drivers_monthly_selected %>% filter(monthnum %in% c(2,5,8,11))
+X_1 <- X_1[-nrow(X_1),]
+X_1 <- X_1 %>% select(Unemp_Rate, CPIAUCSL_change, Fed_Funds, SP_500_change)
+df_price_quarterly <- df_price_quarterly[-c(1:11),]
+autoreg_y <- df_price_quarterly$lag
+
+midas_data <- data.frame(df_price_quarterly$change,autoreg_y,X2,X1,X0,X_1)
+midas_data[is.na(midas_data)] <- 0
+colnames(midas_data) <- c("response","autoreg_y","X_Unemp_Rate_2","X_CPIAUCSL_change_2","X_Fed_Funds_2","X_SP_500_change_2",
+                          "X_Unemp_Rate_1","X_CPIAUCSL_change_1","X_Fed_Funds_1","X_SP_500_change_1",
+                          "X_Unemp_Rate_0","X_CPIAUCSL_change_0","X_Fed_Funds_0","X_SP_500_change_0",
+                          "X_Unemp_Rate_-1","X_CPIAUCSL_change_-1","X_Fed_Funds_-1","X_SP_500_change_-1")
+midas_data1 <- midas_data[,-c((ncol(midas_data)-7):ncol(midas_data))]
+midas_data2 <- midas_data[,-c((ncol(midas_data)-3):ncol(midas_data))]
+midas_data3 <- midas_data
+model_midasK1 <- lm(response~.,data=midas_data1)
+model_midasK2 <- lm(response~.,data=midas_data2)
+model_midasK3 <- lm(response~.,data=midas_data3)
+calc_AIC(model_midasK1)
+calc_AIC(model_midasK2)
+calc_AIC(model_midasK3)
+#task h
+forecasts_midas <- list()
+forecasts_midas[1] <- NA
+for (i in 1:(nrow(midas_data1)-1)){
+  train_df <- midas_data1[1:i,]
+  midas_model <- lm(response~.,data=train_df)
+  forecasts_midas[i+1] <- predict(midas_model,midas_data1[i+1,2:ncol(midas_data1)])
 }
-X_Unemp_Rate[is.na(X_Unemp_Rate)] <- 0
-X_CPIAUCSL_change[is.na(X_CPIAUCSL_change)] <- 0
-X_Fed_Funds[is.na(X_Fed_Funds)] <- 0
-X_SP_500_change[is.na(X_SP_500_change)] <- 0
 
-midas_data <- data.frame()
-midas_data <- data.frame(df_price_quarterly$change,autoreg_y,X_Unemp_Rate,X_CPIAUCSL_change,X_Fed_Funds,X_SP_500_change)
-colnames(midas_data) <- c("response","autoreg_y","X_Unemp_Rate_2","X_Unemp_Rate_1","X_Unemp_Rate_0","X_CPIAUCSL_change_2","X_CPIAUCSL_change_1",
-                           "X_CPIAUCSL_change_0","X_Fed_Funds_2","X_Fed_Funds_1","X_Fed_Funds_0","X_SP_500_change_2","X_SP_500_change_1",
-                           "X_SP_500_change_0")
+forecasts_midas <- unlist(forecasts_midas)
 
-model_midas <- lm(midas_data$response~.,data=midas_data)
+
+forecasts_with_realized <- cbind(df_price_quarterly %>% select(quarter, change), forecasts_midas)
+forecasts_with_realized_long <- melt(forecasts_with_realized, 
+                                     id.vars = c('quarter'))
+forecasts_with_realized_long$quarter <- as.yearqtr(forecasts_with_realized_long$quarter, format = "%Y Q%q")
+
+ggplot(forecasts_with_realized_long, aes(x=quarter)) + 
+  geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
+  geom_point(aes(y = value/100, color = variable)) + 
+  scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00"), labels = c('Actual', 'Forecasted')) + # Add color legend with blue and orange colors
+  ylab('Growth Rate') + xlab('Quarters') +
+  scale_x_yearqtr(breaks = seq(min(as.yearqtr(forecasts_with_realized_long$quarter)), 
+                               max(as.yearqtr(forecasts_with_realized_long$quarter)), 
+                               by = 1),
+                  labels = function(x) format(x, "%Y Q%q"),
+                  expand = c(0, 0)) +
+  ggtitle('Actual vs. Forecasted Growth Rate in AR(1) Model') +
+  scale_y_continuous(labels = scales::percent_format())
+
+
+#task i
+step.model <- step(model_midasK1, direction = "backward", 
+                      trace = TRUE)
+summary(step.model)
+
+
+forecasts_midas <- list()
+forecasts_midas[1] <- NA
+for (i in 1:(nrow(midas_data1)-1)){
+  train_df <- midas_data1[1:i,]
+  midas_model <- lm(response~autoreg_y+X_SP_500_change_1,data=train_df)
+  forecasts_midas[i+1] <- predict(midas_model,midas_data1[i+1,2:ncol(midas_data1)])
+}
+
+forecasts_midas <- unlist(forecasts_midas)
+
+
+forecasts_with_realized <- cbind(df_price_quarterly %>% select(quarter, change), forecasts_midas)
+forecasts_with_realized_long <- melt(forecasts_with_realized, 
+                                     id.vars = c('quarter'))
+forecasts_with_realized_long$quarter <- as.yearqtr(forecasts_with_realized_long$quarter, format = "%Y Q%q")
+
+ggplot(forecasts_with_realized_long, aes(x=quarter)) + 
+  geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
+  geom_point(aes(y = value/100, color = variable)) + 
+  scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00"), labels = c('Actual', 'Forecasted')) + # Add color legend with blue and orange colors
+  ylab('Growth Rate') + xlab('Quarters') +
+  scale_x_yearqtr(breaks = seq(min(as.yearqtr(forecasts_with_realized_long$quarter)), 
+                               max(as.yearqtr(forecasts_with_realized_long$quarter)), 
+                               by = 1),
+                  labels = function(x) format(x, "%Y Q%q"),
+                  expand = c(0, 0)) +
+  ggtitle('Actual vs. Forecasted Growth Rate in AR(1) Model') +
+  scale_y_continuous(labels = scales::percent_format())
+
+
 #predictions <- predict(model_midas)
-calc_AIC(model_midas)
+library(rms)
+model_midasK1 <- ols(response~.,data=midas_data1)
+step.model1 <-fastbw(model_midasK1,rule="aic",sls=0.1)
+  
 plot_df <- cbind(df_price_quarterly %>% select(quarter, change),model_midas$fitted.values)
 colnames(plot_df)<-c("Quarter","Actual","Fitted")
 plot_df$Quarter <- as.yearqtr(plot_df$Quarter, format = "%Y Q%q")
@@ -529,4 +584,7 @@ ggplot(plot_df,aes(x=Quarter)) +
   geom_line(aes(y=Actual, color="blue")) +
   geom_line(aes(y=Fitted,color="red"))
 labs(x = 'Date', y = NULL)
+
+
+#part l
 
