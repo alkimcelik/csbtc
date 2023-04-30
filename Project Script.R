@@ -420,33 +420,27 @@ ggplot(forecasts_with_realized_with_var_3_long, aes(x=quarter)) +
 forecasts_with_realized_with_var_3_extracted <- forecasts_with_realized_with_var_3[-c(1:18),]
 RMSE_VAR3 <- mean((forecasts_with_realized_with_var_3_extracted$change - forecasts_with_realized_with_var_3_extracted$forecasts_var3)**2)**0.5
 
-#part h
+
+
+#######PART II#######
+####DATA MANIPULATION####
 df$month <- paste(mondate::year(df$Date),mondate::month(df$Date))
 df_price_monthly <- df %>% group_by(month) %>% summarise(price = mean(Price))
-
-
-
 df_price_monthly <- df %>%
   group_by(month = format(Date, "%Y-%m")) %>%
   summarize(price = mean(Price))
-
 df_price_monthly <- df_price_monthly[-c((nrow(df_price_monthly)-3):nrow(df_price_monthly)),]
 df_price_monthly <- df_price_monthly[-c(1:2),]
-
 df_price_monthly$lag <- lag(df_price_monthly$price)
 df_price_monthly$change <- change_func(df_price_monthly$price, df_price_monthly$lag)
 #df_price_monthly = df_price_monthly[-c(52),] #last quarter not finished
 df_price_monthly$lag <- na.fill(df_price_monthly$lag, 0)
 df_price_monthly$change <- na.fill(df_price_monthly$change, 0)
 
-
-
-
 #Anil
 df_drivers_monthly <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current_monthly.csv')
 #Elcin
 #df_drivers_monthly <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current_monthly.csv')
-
 
 df_drivers_monthly <- df_drivers_monthly %>% select(c('sasdate','UNRATE','CPIAUCSL', 'FEDFUNDS', 
                                       'S.P.500', 'S.P..indust', 'S.P.div.yield',
@@ -466,24 +460,14 @@ df_drivers_monthly$CPIAUCSL_change <- change_func(df_drivers_monthly$CPIAUCSL, d
 #df_drivers_monthly$CPILFESL_change <- change_func(df_drivers_monthly$CPILFESL, df_drivers_monthly$CPILFESL_lag)
 df_drivers_monthly <- df_drivers_monthly[-c((nrow(df_drivers_monthly)-1):nrow(df_drivers_monthly)),]
 df_drivers_monthly <- cbind(df_drivers_monthly,df_price_monthly$month)
-
-
-
 combined_df_monthly <- cbind(df_price_monthly,df_drivers_monthly[,-c(1,ncol(df_drivers_monthly))])
 #combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
 combined_df_monthly <- combined_df_monthly[-c(1:31),]
 
-install.packages("midasr")
-library(midasr)
-df_midas <- combined_df_monthly[c('change','Unemp_Rate','CPIAUCSL_change','Fed_Funds','SP_500_change')]
-model_midas <- midas_r(change ~ 1 + L(1:3, "change") + L(1:3, "Unemp_Rate") + L(1:3, "CPIAUCSL_change") + L(1:3, "Fed_Funds") +L(1:3, "SP_500_change"))
-
-
-
-
+#Part h
 t <- nrow(df_drivers)  # number of full quarters in the sample
-T <- nrow(df_drivers_monthly)
-K <- 3
+#T <- nrow(df_drivers_monthly)
+#K <- 3
 X_Unemp_Rate <- data.frame()
 X_CPIAUCSL_change <- data.frame()
 X_Fed_Funds <- data.frame()
@@ -522,23 +506,20 @@ X_CPIAUCSL_change[is.na(X_CPIAUCSL_change)] <- 0
 X_Fed_Funds[is.na(X_Fed_Funds)] <- 0
 X_SP_500_change[is.na(X_SP_500_change)] <- 0
 
+midas_data <- data.frame()
+midas_data <- data.frame(df_price_quarterly$change,autoreg_y,X_Unemp_Rate,X_CPIAUCSL_change,X_Fed_Funds,X_SP_500_change)
+colnames(midas_data) <- c("response","autoreg_y","X_Unemp_Rate_2","X_Unemp_Rate_1","X_Unemp_Rate_0","X_CPIAUCSL_change_2","X_CPIAUCSL_change_1",
+                           "X_CPIAUCSL_change_0","X_Fed_Funds_2","X_Fed_Funds_1","X_Fed_Funds_0","X_SP_500_change_2","X_SP_500_change_1",
+                           "X_SP_500_change_0")
 
-regressor_X <- data.frame(autoreg_y,X_Unemp_Rate,X_CPIAUCSL_change,X_Fed_Funds,X_SP_500_change,autoreg_y)
-regressor_X <- as.matrix(regressor_X)
-fit_Y <- as.matrix(df_price_quarterly$change)
-model_midas <- lm(fit_Y~regressor_X)
+model_midas <- lm(midas_data$response~.,data=midas_data)
 #predictions <- predict(model_midas)
 
-df_temp <- data.frame(df_price_quarterly$quarter,df_price_quarterly$change,model_midas$fitted.values)
-colnames(df_temp) <- c("quarter","change","fitted_values")
-df_temp_melted <- melt(df_temp, id.vars = "quarter")
-
-ggplot(df_temp,aes(x=quarter)) +
-  geom_line(aes(y=change, color="blue")) +
-  geom_line(aes(y=fitted_values,color="red"))
+plot_df <- cbind(df_price_quarterly %>% select(quarter, change),model_midas$fitted.values)
+colnames(plot_df)<-c("Quarter","Actual","Fitted")
+plot_df$Quarter <- as.yearqtr(plot_df$Quarter, format = "%Y Q%q")
+ggplot(plot_df,aes(x=Quarter)) +
+  geom_line(aes(y=Actual, color="blue")) +
+  geom_line(aes(y=Fitted,color="red"))
 labs(x = 'Date', y = NULL)
-
-plot(df_temp$change, typle="l")
-plot(df_temp$fitted_values,type="l")
-
 
