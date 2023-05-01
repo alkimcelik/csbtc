@@ -30,6 +30,12 @@ calc_AIC <- function(model){
   AIC <- n*log(sum(model$residuals^2)/n) + 2*k
   return(AIC)
 }
+calc_AIC_var <- function(model){
+  n <- length(model$varresult$change$residuals)
+  k <- length(model$varresult$change$coefficients)
+  AIC <- n*log(sum(model$varresult$change$residuals^2)/n) + 2*k
+  return(AIC)
+}
 my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
                  panel.background = element_rect(fill = 'white'),
                  plot.title = element_text(hjust = .5, size = 12, colour = 'black'),
@@ -87,7 +93,8 @@ df$contains_str <- NULL
 df$Change <- as.numeric(sub("%", "", df$Change, fixed=TRUE))/100
 
 df$quarter <- paste(mondate::year(df$Date),quarters(df$Date))
-df_price_quarterly <- df %>% group_by(quarter) %>% summarise(price = mean(Price))
+df_price_quarterly <- df %>% group_by(quarter) %>% summarise(price = exp(mean(log((Price)))))
+#df_price_quarterly <- df %>% group_by(quarter) %>% summarise(price = mean(Price))
 df_price_quarterly$lag <- lag(df_price_quarterly$price)
 df_price_quarterly$change <- change_func(df_price_quarterly$price, df_price_quarterly$lag)
 df_price_quarterly = df_price_quarterly[-c(52),] #last quarter not finished
@@ -150,20 +157,20 @@ ggplot(combined_df, aes(x = as.yearqtr(combined_df$quarter, format = '%Y Q%q')))
                   expand = c(0, 0)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
-combined_df_2017 <- combined_df %>% filter(as.yearqtr(df_price_quarterly_without_2023_q1$quarter, format = '%Y Q%q') >= '2017 Q1')
-
-ggplot(combined_df_2017, aes(x = as.yearqtr(combined_df_2017$quarter, format = '%Y Q%q'))) +
-  geom_line(aes(y = change/100),color = 'darkgreen', linewidth = 1) + 
-  geom_point(aes(y = change/100),color = 'darkgreen') +
-  ylab('Growth Rate') + xlab('Quarters') +
-  ggtitle('Bitcoin Quarterly Growth Rate between 2017 Q1 to 2023 Q1') +
-  scale_y_continuous(labels = scales::percent_format()) +
-  scale_x_yearqtr(breaks = seq(min(as.yearqtr(combined_df_2017$quarter)), 
-                               max(as.yearqtr(combined_df_2017$quarter)), 
-                               by = 1/4),
-                  labels = function(x) format(x, "%Y Q%q"),
-                  expand = c(0, 0)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
+# combined_df_2017 <- combined_df %>% filter(as.yearqtr(df_price_quarterly_without_2023_q1$quarter, format = '%Y Q%q') >= '2017 Q1')
+# 
+# ggplot(combined_df_2017, aes(x = as.yearqtr(combined_df_2017$quarter, format = '%Y Q%q'))) +
+#   geom_line(aes(y = change/100),color = 'darkgreen', linewidth = 1) + 
+#   geom_point(aes(y = change/100),color = 'darkgreen') +
+#   ylab('Growth Rate') + xlab('Quarters') +
+#   ggtitle('Bitcoin Quarterly Growth Rate between 2017 Q1 to 2023 Q1') +
+#   scale_y_continuous(labels = scales::percent_format()) +
+#   scale_x_yearqtr(breaks = seq(min(as.yearqtr(combined_df_2017$quarter)), 
+#                                max(as.yearqtr(combined_df_2017$quarter)), 
+#                                by = 1/4),
+#                   labels = function(x) format(x, "%Y Q%q"),
+#                   expand = c(0, 0)) +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
 #Time series decomposition - Bitcoin
 price_ts <- ts(df_price_quarterly_without_2023_q1[order(combined_df$quarter),]$change, start = c(2010,3), frequency = 4)
@@ -317,6 +324,7 @@ ggplot(data = correlation, aes(x = Var2, y = Var1, fill = value)) +
   ggtitle('Correlation Heatmap')
 
 
+
 #part_C  
 #Growth ratelerde stationarity testi yapip stationary hale getirecek miyiz
 ts_data <- ts(combined_df$change, start = c(2013,2), frequency = 4)
@@ -393,13 +401,18 @@ print(causality(var_model, cause = 'change')$Granger)
 
 #part f
 lags <- 1:3
-optimal_lag <- VARselect(var_data, lag.max = 3, type = 'none')$selection['AIC(n)']
+var_model1 <- VAR(var_data, p = 1, type = 'none')
+var_model2 <- VAR(var_data, p = 2, type = 'none')
+var_model3 <- VAR(var_data, p = 3, type = 'none')
+calc_AIC_var(var_model1)
+calc_AIC_var(var_model2)
+calc_AIC_var(var_model3)
 forecasts_var3 <- list()
 aic3 <- list()
 forecasts_var3[1:5] <- NA
 for (i in 5:(nrow(var_data)-1)){
   train_df <- var_data[1:i,]
-  var_model <- VAR(train_df, p = optimal_lag, type = 'none')
+  var_model <- VAR(train_df, p = 3, type = 'none')
   forecasts_var3 <- c(forecasts_var3,predict(var_model,n.ahead=1)$fcst$change[1])
 }
 
@@ -434,9 +447,9 @@ df$month <- paste(mondate::year(df$Date),mondate::month(df$Date))
 df_price_monthly <- df %>% group_by(month) %>% summarise(price = mean(Price))
 df_price_monthly <- df %>%
   group_by(month = format(Date, "%Y-%m")) %>%
-  summarize(price = mean(Price))
-df_price_monthly <- df_price_monthly[-c((nrow(df_price_monthly)-3):nrow(df_price_monthly)),]
-df_price_monthly <- df_price_monthly[-c(1:2),]
+  dplyr::summarize(price = mean(Price))
+df_price_monthly <- df_price_monthly[-c((nrow(df_price_monthly)-1):nrow(df_price_monthly)),]
+df_price_monthly <- df_price_monthly[-c(1:31),]
 df_price_monthly$lag <- lag(df_price_monthly$price)
 df_price_monthly$change <- change_func(df_price_monthly$price, df_price_monthly$lag)
 #df_price_monthly = df_price_monthly[-c(52),] #last quarter not finished
@@ -487,10 +500,10 @@ X0 <- X0 %>% select(Unemp_Rate, CPIAUCSL_change, Fed_Funds, SP_500_change)
 X_1 <- df_drivers_monthly_selected %>% filter(monthnum %in% c(2,5,8,11))
 X_1 <- X_1[-nrow(X_1),]
 X_1 <- X_1 %>% select(Unemp_Rate, CPIAUCSL_change, Fed_Funds, SP_500_change)
-df_price_quarterly <- df_price_quarterly[-c(1:11),]
-autoreg_y <- df_price_quarterly$lag
+df_price_quarterly_extracted <- df_price_quarterly[-c(1:11),]
+autoreg_y <- lag(df_price_quarterly_extracted$change)
 
-midas_data <- data.frame(df_price_quarterly$change,autoreg_y,X2,X1,X0,X_1)
+midas_data <- data.frame(df_price_quarterly_extracted$change,autoreg_y,X2,X1,X0,X_1)
 midas_data[is.na(midas_data)] <- 0
 colnames(midas_data) <- c("response","autoreg_y","X_Unemp_Rate_2","X_CPIAUCSL_change_2","X_Fed_Funds_2","X_SP_500_change_2",
                           "X_Unemp_Rate_1","X_CPIAUCSL_change_1","X_Fed_Funds_1","X_SP_500_change_1",
@@ -517,7 +530,7 @@ for (i in 1:(nrow(midas_data1)-1)){
 forecasts_midas <- unlist(forecasts_midas)
 
 
-forecasts_with_realized <- cbind(df_price_quarterly %>% select(quarter, change), forecasts_midas)
+forecasts_with_realized <- cbind(df_price_quarterly_extracted %>% select(quarter, change), forecasts_midas)
 forecasts_with_realized_long <- melt(forecasts_with_realized, 
                                      id.vars = c('quarter'))
 forecasts_with_realized_long$quarter <- as.yearqtr(forecasts_with_realized_long$quarter, format = "%Y Q%q")
@@ -532,7 +545,7 @@ ggplot(forecasts_with_realized_long, aes(x=quarter)) +
                                by = 1),
                   labels = function(x) format(x, "%Y Q%q"),
                   expand = c(0, 0)) +
-  ggtitle('Actual vs. Forecasted Growth Rate in AR(1) Model') +
+  ggtitle('Actual vs. Forecasted Growth Rate in MIDAS Model') +
   scale_y_continuous(labels = scales::percent_format())
 
 
@@ -546,25 +559,25 @@ forecasts_midas <- list()
 forecasts_midas[1] <- NA
 for (i in 1:(nrow(midas_data1)-1)){
   train_df <- midas_data1[1:i,]
-  midas_model <- lm(response~autoreg_y+X_SP_500_change_1,data=train_df)
+  midas_model <- lm(response~X_Unemp_Rate_1+X_Unemp_Rate_2,data=train_df)
   forecasts_midas[i+1] <- predict(midas_model,midas_data1[i+1,2:ncol(midas_data1)])
 }
 
 forecasts_midas <- unlist(forecasts_midas)
 
 
-forecasts_with_realized <- cbind(df_price_quarterly %>% select(quarter, change), forecasts_midas)
-forecasts_with_realized_long <- melt(forecasts_with_realized, 
+forecasts_with_realized_midas <- cbind(df_price_quarterly_extracted %>% select(quarter, change), forecasts_midas)
+forecasts_with_realized_midas_long <- melt(forecasts_with_realized_midas, 
                                      id.vars = c('quarter'))
-forecasts_with_realized_long$quarter <- as.yearqtr(forecasts_with_realized_long$quarter, format = "%Y Q%q")
-
-ggplot(forecasts_with_realized_long, aes(x=quarter)) + 
+forecasts_with_realized_midas_long$quarter <- as.yearqtr(forecasts_with_realized_midas_long$quarter, format = "%Y Q%q")
+#task j
+ggplot(forecasts_with_realized_midas_long, aes(x=quarter)) + 
   geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
   geom_point(aes(y = value/100, color = variable)) + 
   scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00"), labels = c('Actual', 'Forecasted')) + # Add color legend with blue and orange colors
   ylab('Growth Rate') + xlab('Quarters') +
-  scale_x_yearqtr(breaks = seq(min(as.yearqtr(forecasts_with_realized_long$quarter)), 
-                               max(as.yearqtr(forecasts_with_realized_long$quarter)), 
+  scale_x_yearqtr(breaks = seq(min(as.yearqtr(forecasts_with_realized_midas_long$quarter)), 
+                               max(as.yearqtr(forecasts_with_realized_midas_long$quarter)), 
                                by = 1),
                   labels = function(x) format(x, "%Y Q%q"),
                   expand = c(0, 0)) +
@@ -573,18 +586,81 @@ ggplot(forecasts_with_realized_long, aes(x=quarter)) +
 
 
 #predictions <- predict(model_midas)
-library(rms)
-model_midasK1 <- ols(response~.,data=midas_data1)
-step.model1 <-fastbw(model_midasK1,rule="aic",sls=0.1)
+# library(rms)
+# model_midasK1 <- ols(response~.,data=midas_data1)
+# step.model1 <-fastbw(model_midasK1,rule="aic",sls=0.1)
   
-plot_df <- cbind(df_price_quarterly %>% select(quarter, change),model_midas$fitted.values)
-colnames(plot_df)<-c("Quarter","Actual","Fitted")
-plot_df$Quarter <- as.yearqtr(plot_df$Quarter, format = "%Y Q%q")
-ggplot(plot_df,aes(x=Quarter)) +
-  geom_line(aes(y=Actual, color="blue")) +
-  geom_line(aes(y=Fitted,color="red"))
-labs(x = 'Date', y = NULL)
+# plot_df <- cbind(df_price_quarterly_extracted %>% select(quarter, change),model_midas$fitted.values)
+# colnames(plot_df)<-c("Quarter","Actual","Fitted")
+# plot_df$Quarter <- as.yearqtr(plot_df$Quarter, format = "%Y Q%q")
+# ggplot(plot_df,aes(x=Quarter)) +
+#   geom_line(aes(y=Actual, color="blue")) +
+#   geom_line(aes(y=Fitted,color="red"))
+# labs(x = 'Date', y = NULL)
 
+
+#RMSE
+forecasts_with_realized_midas <- forecasts_with_realized_midas[-1,]
+RMSE_midas <- mean((forecasts_with_realized_midas$change - forecasts_with_realized_midas$forecasts_midas)**2)**0.5
+RMSE_midas
+
+#part k
+cbind(df_price_quarterly %>% select(quarter, change), forecasts_ar_partl,forecasts_var1, forecasts_partl)
 
 #part l
+var_data_partl <- df_drivers_monthly_selected %>% select(-c(Date,monthnum))
+var_data_partl <- cbind(df_price_monthly$change,var_data_partl)
+var_data_partl <- na.fill(var_data_partl, 0)
+lags <- 1:12
+optimal_lag <- VARselect(var_data_partl, lag.max = 12, type = 'none')$selection['AIC(n)']
+forecasts_partl <- list()
+aic_partl <- list()
+forecasts_partl[1:5] <- NA
+for (i in 5:(nrow(var_data_partl)-1)){
+  train_df <- var_data_partl[1:i,]
+  var_model <- VAR(train_df, p = optimal_lag, type = 'none')
+  forecasts_partl <- c(forecasts_partl,predict(var_model,n.ahead=1)$fcst$df_price_monthly.change[1])
+}
+
+forecasts_partl <- unlist(forecasts_partl)
+
+#AR
+ts_data_partl <- ts(df_price_monthly$change, start = c(2013,2), frequency = 12)
+forecasts_ar_partl <- list()
+forecasts_ar_partl[1:2] <- NA
+for (i in 2:(length(ts_data_partl)-1)){
+  train_df <- ts_data_partl[1:i]
+  ar1_model <- ar(train_df, order = 1)
+  forecasts_ar_partl[i+1] <- forecast(ar1_model,h=1)$mean
+}
+
+forecasts_ar_partl <- unlist(forecasts_ar_partl)
+#VAR(1)
+
+forecasts_var1 <- list()
+forecasts_var1[1:3] <- NA
+for (i in 3:(nrow(var_data_partl)-1)){
+  train_df <- var_data_partl[1:i,]
+  var_model <- VAR(train_df, p = 1, type = 'none')
+  forecasts_var1[i+1] <- predict(var_model,n.ahead=1)$fcst$df_price_monthly.change[1]
+}
+forecasts_var1 <- unlist(forecasts_var1)
+
+forecasts_compr <- cbind(df_price_monthly %>% select(month, change), forecasts_ar_partl,forecasts_var1, forecasts_partl)
+forecasts_compr_long <- melt(forecasts_compr,id.vars = c('month'))
+
+forecasts_compr_long$month <-as.Date(as.yearmon(forecasts_compr_long$month))
+ggplot(forecasts_compr_long, aes(x=month)) + 
+  geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
+  #geom_point(aes(y = value/100, color = variable)) + 
+  scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00", "red", 'darkgreen'), labels = c('Actual', 'AR(1)', 'VAR(1)','VAR(3)')) + # Add color legend with blue and orange colors
+  ylab('Growth Rate') + xlab('Month') +
+  ggtitle('Actual vs. Forecasted Growth Rates in AR(1), VAR(1), and VAR(3) Models') +
+  scale_y_continuous(labels = scales::percent_format())
+
+forecasts_compr_extracted <- forecasts_compr[-c(1:18),]
+RMSE_VAR_partl <- mean((forecasts_compr_extracted$change - forecasts_compr_extracted$forecasts_partl)**2)**0.5
+RMSE_VAR_partl
+
+
 
