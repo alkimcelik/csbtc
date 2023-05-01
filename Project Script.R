@@ -49,8 +49,8 @@ my_theme = theme(panel.grid = element_line(color = '#e6e6e6'),
 Sys.setlocale("LC_TIME", "C")
 
 #Anil
-df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
+#df <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+#df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
 ##Mert 
 #df <- read.csv(file= "/Users/mertbasaran/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv")
 #df_drivers <- read.csv(file = "/Users/mertbasaran/Documents/GitHub/csbtc/current.csv")
@@ -60,8 +60,8 @@ df_drivers <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current.csv')
 #df_drivers <- read.csv('C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current.csv')
 
 #Alkim
-#df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
-#df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
+df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
+df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
 
 
 #########Data Manipulation########
@@ -355,8 +355,8 @@ ggplot(forecasts_with_realized_long, aes(x=quarter)) +
   ggtitle('Actual vs. Forecasted Growth Rate in AR(1) Model') +
   scale_y_continuous(labels = scales::percent_format())
 
-forecasts_with_realized_extracted <- forecasts_with_realized[-c(1:2),]
-RMSE_AR <- mean((forecasts_with_realized_extracted$change - forecasts_with_realized_extracted$forecasts_ar)**2)**0.5
+forecasts_with_realized_extracted_ar <- forecasts_with_realized[-c(1:2),]
+RMSE_AR <- mean((forecasts_with_realized_extracted_ar$change - forecasts_with_realized_extracted_ar$forecasts_ar)**2)**0.5
 
 #part d
 var_data <- combined_df %>% select(change, Unemp_Rate, CPILFESL, Fed_Funds, SP_500_change)
@@ -457,11 +457,11 @@ df_price_monthly$lag <- na.fill(df_price_monthly$lag, 0)
 df_price_monthly$change <- na.fill(df_price_monthly$change, 0)
 
 #Anil
-df_drivers_monthly <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current_monthly.csv')
+#df_drivers_monthly <- read.csv(file= 'C:/Users/asus/Documents/GitHub/csbtc/current_monthly.csv')
 #Elcin
 #df_drivers_monthly <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current_monthly.csv')
 #Alkim
-#df_drivers_monthly <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current_monthly.csv')
+df_drivers_monthly <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current_monthly.csv')
 df_drivers_monthly <- df_drivers_monthly %>% select(c('sasdate','UNRATE','CPIAUCSL', 'FEDFUNDS', 
                                       'S.P.500', 'S.P..indust', 'S.P.div.yield',
                                       'S.P.PE.ratio')) 
@@ -513,6 +513,8 @@ midas_data1 <- midas_data[,-c((ncol(midas_data)-7):ncol(midas_data))]
 midas_data2 <- midas_data[,-c((ncol(midas_data)-3):ncol(midas_data))]
 midas_data3 <- midas_data
 model_midasK1 <- lm(response~.,data=midas_data1)
+summary(model_midasK1)
+calc_AIC(model_midasK1)
 model_midasK2 <- lm(response~.,data=midas_data2)
 model_midasK3 <- lm(response~.,data=midas_data3)
 calc_AIC(model_midasK1)
@@ -559,7 +561,8 @@ forecasts_midas <- list()
 forecasts_midas[1] <- NA
 for (i in 1:(nrow(midas_data1)-1)){
   train_df <- midas_data1[1:i,]
-  midas_model <- lm(response~X_Unemp_Rate_1+X_Unemp_Rate_2,data=train_df)
+  #midas_model <- lm(response~autoreg_y+X_SP_500_change_1,data=train_df)
+  midas_model <- lm(response~autoreg_y +X_SP_500_change_1,data=train_df)
   forecasts_midas[i+1] <- predict(midas_model,midas_data1[i+1,2:ncol(midas_data1)])
 }
 
@@ -586,9 +589,9 @@ ggplot(forecasts_with_realized_midas_long, aes(x=quarter)) +
 
 
 #predictions <- predict(model_midas)
-# library(rms)
-# model_midasK1 <- ols(response~.,data=midas_data1)
-# step.model1 <-fastbw(model_midasK1,rule="aic",sls=0.1)
+#library(rms)
+#model_midasK1 <- ols(response~.,data=midas_data1)
+#step.model1 <-fastbw(model_midasK1,rule="aic",sls=0.1)
   
 # plot_df <- cbind(df_price_quarterly_extracted %>% select(quarter, change),model_midas$fitted.values)
 # colnames(plot_df)<-c("Quarter","Actual","Fitted")
@@ -605,7 +608,8 @@ RMSE_midas <- mean((forecasts_with_realized_midas$change - forecasts_with_realiz
 RMSE_midas
 
 #part k
-cbind(df_price_quarterly %>% select(quarter, change), forecasts_ar_partl,forecasts_var1, forecasts_partl)
+cbind(df_price_quarterly %>% select(quarter, change), 
+      forecasts_ar,forecasts_var, forecasts_var3,forecasts_midas)
 
 #part l
 var_data_partl <- df_drivers_monthly_selected %>% select(-c(Date,monthnum))
