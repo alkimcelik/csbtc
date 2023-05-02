@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.4.16)  16 APR 2023 21:31
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2023.5.1)  1 MAY 2023 14:52
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1012,127 +1012,110 @@ thkerncmss.
 <BTC_Daily_all.png, id=435, 838.13126pt x 441.65pt>
 File: BTC_Daily_all.png Graphic file (type png)
 <use BTC_Daily_all.png>
-Package pdftex.def Info: BTC_Daily_all.png  used on input line 119.
+Package pdftex.def Info: BTC_Daily_all.png  used on input line 121.
 (pdftex.def)             Requested size: 230.46739pt x 121.44402pt.
  [8
 
- <./BTC_Daily_all.png>] [9
+ <./BTC_Daily_all.png>]
+Overfull \hbox (2.78949pt too wide) in paragraph at lines 143--143
+[][]  
+ []
+
+[9
 
 ]
 <BTC_Daily_2017.png, id=538, 838.13126pt x 441.65pt>
 File: BTC_Daily_2017.png Graphic file (type png)
 <use BTC_Daily_2017.png>
-Package pdftex.def Info: BTC_Daily_2017.png  used on input line 139.
+Package pdftex.def Info: BTC_Daily_2017.png  used on input line 151.
 (pdftex.def)             Requested size: 230.46739pt x 121.44402pt.
  [10
 
  <./BTC_Daily_2017.png>]
-<BTC_Growth_2017.png, id=591, 838.13126pt x 441.65pt>
-File: BTC_Growth_2017.png Graphic file (type png)
-<use BTC_Growth_2017.png>
-Package pdftex.def Info: BTC_Growth_2017.png  used on input line 148.
-(pdftex.def)             Requested size: 230.46739pt x 121.44402pt.
-[11
-
- <./BTC_Growth_2017.png>]
-<BTC_G_All.png, id=643, 838.13126pt x 441.65pt>
+<BTC_G_All.png, id=591, 838.13126pt x 441.65pt>
 File: BTC_G_All.png Graphic file (type png)
 <use BTC_G_All.png>
-Package pdftex.def Info: BTC_G_All.png  used on input line 157.
+Package pdftex.def Info: BTC_G_All.png  used on input line 159.
 (pdftex.def)             Requested size: 230.46739pt x 121.44402pt.
-
-pdfTeX warning (ext4): destination with the same identifier (name{fig:BTCpart1}
-) has been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.157 	\end{frame}
-                   [12
+ [11
 
  <./BTC_G_All.png>]
-<BTC_decom.png, id=695, 838.13126pt x 386.44376pt>
+<BTC_decom.png, id=643, 838.13126pt x 386.44376pt>
 File: BTC_decom.png Graphic file (type png)
 <use BTC_decom.png>
-Package pdftex.def Info: BTC_decom.png  used on input line 173.
+Package pdftex.def Info: BTC_decom.png  used on input line 177.
 (pdftex.def)             Requested size: 307.28987pt x 141.68468pt.
- [13
+ [12
 
  <./BTC_decom.png>]
-<BTC_lag_corr.png, id=748, 486.31688pt x 346.29375pt>
-File: BTC_lag_corr.png Graphic file (type png)
-<use BTC_lag_corr.png>
-Package pdftex.def Info: BTC_lag_corr.png  used on input line 187.
-(pdftex.def)             Requested size: 230.46739pt x 164.11078pt.
- [14
+<acf.png, id=696, 651.18282pt x 433.62pt>
+File: acf.png Graphic file (type png)
+<use acf.png>
+Package pdftex.def Info: acf.png  used on input line 200.
+(pdftex.def)             Requested size: 153.64493pt x 102.31093pt.
+<pacf.png, id=697, 651.18282pt x 433.62pt>
+File: pacf.png Graphic file (type png)
+<use pacf.png>
+Package pdftex.def Info: pacf.png  used on input line 200.
+(pdftex.def)             Requested size: 153.64493pt x 102.31093pt.
 
- <./BTC_lag_corr.png (PNG copy)>]
-<Unemployment.png, id=800, 696.35156pt x 439.6425pt>
+[13
+
+ <./acf.png> <./pacf.png>]
+<Unemployment.png, id=752, 696.35156pt x 439.6425pt>
 File: Unemployment.png Graphic file (type png)
 <use Unemployment.png>
-Package pdftex.def Info: Unemployment.png  used on input line 195.
+Package pdftex.def Info: Unemployment.png  used on input line 208.
 (pdftex.def)             Requested size: 230.46739pt x 145.5051pt.
- [15
+ [14
 
  <./Unemployment.png>]
-<CPI_Growth.png, id=852, 838.13126pt x 441.65pt>
+<CPI_Growth.png, id=805, 838.13126pt x 441.65pt>
 File: CPI_Growth.png Graphic file (type png)
 <use CPI_Growth.png>
-Package pdftex.def Info: CPI_Growth.png  used on input line 203.
+Package pdftex.def Info: CPI_Growth.png  used on input line 216.
 (pdftex.def)             Requested size: 230.46739pt x 121.44402pt.
- [16
+ [15
 
  <./CPI_Growth.png>]
-<Federal_Funds_Rate.png, id=905, 696.35156pt x 439.6425pt>
+<Federal_Funds_Rate.png, id=857, 696.35156pt x 439.6425pt>
 File: Federal_Funds_Rate.png Graphic file (type png)
 <use Federal_Funds_Rate.png>
-Package pdftex.def Info: Federal_Funds_Rate.png  used on input line 211.
+Package pdftex.def Info: Federal_Funds_Rate.png  used on input line 224.
 (pdftex.def)             Requested size: 230.46739pt x 145.5051pt.
-
-[17
+[16
 
  <./Federal_Funds_Rate.png>]
-<S&P_Quarterly.png, id=957, 696.35156pt x 439.6425pt>
-File: S&P_Quarterly.png Graphic file (type png)
-<use S&P_Quarterly.png>
-Package pdftex.def Info: S&P_Quarterly.png  used on input line 219.
+<SP_Price.png, id=910, 838.13126pt x 441.65pt>
+File: SP_Price.png Graphic file (type png)
+<use SP_Price.png>
+Package pdftex.def Info: SP_Price.png  used on input line 233.
+(pdftex.def)             Requested size: 230.46739pt x 121.44402pt.
+ [17
+
+ <./SP_Price.png>]
+<S_P_Quarterly.png, id=962, 696.35156pt x 439.6425pt>
+File: S_P_Quarterly.png Graphic file (type png)
+<use S_P_Quarterly.png>
+Package pdftex.def Info: S_P_Quarterly.png  used on input line 242.
 (pdftex.def)             Requested size: 230.46739pt x 145.5051pt.
  [18
 
- <./S&P_Quarterly.png>]
-<SP_Price.png, id=1010, 838.13126pt x 441.65pt>
-File: SP_Price.png Graphic file (type png)
-<use SP_Price.png>
-Package pdftex.def Info: SP_Price.png  used on input line 227.
-(pdftex.def)             Requested size: 230.46739pt x 121.44402pt.
- [19
-
- <./SP_Price.png>]
-<SP_decom.png, id=1063, 838.13126pt x 386.44376pt>
+ <./S_P_Quarterly.png>]
+<SP_decom.png, id=1015, 838.13126pt x 386.44376pt>
 File: SP_decom.png Graphic file (type png)
 <use SP_decom.png>
-Package pdftex.def Info: SP_decom.png  used on input line 235.
+Package pdftex.def Info: SP_decom.png  used on input line 250.
 (pdftex.def)             Requested size: 230.46739pt x 106.2635pt.
- [20
+ [19
 
  <./SP_decom.png>]
-File: Unemployment.png Graphic file (type png)
-<use Unemployment.png>
-Package pdftex.def Info: Unemployment.png  used on input line 245.
-(pdftex.def)             Requested size: 230.46739pt x 145.5051pt.
-
-pdfTeX warning (ext4): destination with the same identifier (name{fig:Unemp}) h
-as been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.245 	\end{frame}
-                   [21
-
-]
-<Correlation_HM.png, id=1165, 838.13126pt x 441.65pt>
+<Correlation_HM.png, id=1068, 838.13126pt x 441.65pt>
 File: Correlation_HM.png Graphic file (type png)
 <use Correlation_HM.png>
-Package pdftex.def Info: Correlation_HM.png  used on input line 253.
+Package pdftex.def Info: Correlation_HM.png  used on input line 258.
 (pdftex.def)             Requested size: 230.46739pt x 121.44402pt.
- [22
+ [20
 
  <./Correlation_HM.png>]
 \tf@nav=\write6
@@ -1152,23 +1135,31 @@ Package rerunfilecheck Info: File `"LaTex new 16 Nisan".out' has not changed.
 (rerunfilecheck)             Checksum: 2F661F62AAA339DC3DFEE3C86994DA52;746.
  ) 
 Here is how much of TeX's memory you used:
- 25125 strings out of 476025
- 507689 string characters out of 5790017
+ 25126 strings out of 476025
+ 507498 string characters out of 5790018
  1877388 words of memory out of 5000000
- 45014 multiletter control sequences out of 15000+600000
+ 45016 multiletter control sequences out of 15000+600000
  521932 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,19n,122p,432b,771s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb
-></usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb>
-</usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></
-usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></us
-r/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></u
-sr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb>
-Output written on "LaTex new 16 Nisan.pdf" (22 pages, 578745 bytes).
+
+pdfTeX warning (dest): name{Navigation21} has been referenced but does not exis
+t, replaced by a fixed one
+
+
+pdfTeX warning (dest): name{Navigation22} has been referenced but does not exis
+t, replaced by a fixed one
+
+</usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb><
+/usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></
+usr/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></us
+r/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/
+local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr
+/local/texlive/2023/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb>
+Output written on "LaTex new 16 Nisan.pdf" (20 pages, 501434 bytes).
 PDF statistics:
- 1261 PDF objects out of 1440 (max. 8388607)
- 1158 compressed objects within 12 object streams
- 63 named destinations out of 1000 (max. 500000)
+ 1164 PDF objects out of 1200 (max. 8388607)
+ 1063 compressed objects within 11 object streams
+ 62 named destinations out of 1000 (max. 500000)
  156 words of extra memory for PDF output out of 10000 (max. 10000000)
 

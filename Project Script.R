@@ -62,6 +62,9 @@ Sys.setlocale("LC_TIME", "C")
 #Alkim
 df <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv')
 df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.csv')
+#Deniz
+#df <- read.csv(file="/Users/denizuygur/Documents/GitHub/csbtc/Bitcoin Historical Data - Investing.com (1).csv")
+#df_drivers <- read.csv(file = "/Users/denizuygur/Documents/GitHub/csbtc/current.csv")
 
 
 #########Data Manipulation########
@@ -462,6 +465,8 @@ df_price_monthly$change <- na.fill(df_price_monthly$change, 0)
 #df_drivers_monthly <- read.csv(file= 'C:/Users/Acer/OneDrive - ADA University/Documents/GitHub/csbtc/current_monthly.csv')
 #Alkim
 df_drivers_monthly <- read.csv(file= 'C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current_monthly.csv')
+#Deniz
+#df_drivers_monthly <- read.csv(file= "/Users/denizuygur/Documents/GitHub/csbtc/current_monthly.csv")
 df_drivers_monthly <- df_drivers_monthly %>% select(c('sasdate','UNRATE','CPIAUCSL', 'FEDFUNDS', 
                                       'S.P.500', 'S.P..indust', 'S.P.div.yield',
                                       'S.P.PE.ratio')) 
