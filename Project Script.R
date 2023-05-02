@@ -613,8 +613,9 @@ RMSE_midas <- mean((forecasts_with_realized_midas$change - forecasts_with_realiz
 RMSE_midas
 
 #part k
-cbind(df_price_quarterly %>% select(quarter, change), 
-      forecasts_ar,forecasts_var, forecasts_var3,forecasts_midas)
+all_forecasts <- cbind((df_price_quarterly %>% select(quarter, change))[-c(1:12),], 
+      forecasts_ar,forecasts_var, forecasts_var3,forecasts_midas[-1])
+all_forecasts <- all_forecasts[-c(1:18),]
 
 #part l
 var_data_partl <- df_drivers_monthly_selected %>% select(-c(Date,monthnum))
