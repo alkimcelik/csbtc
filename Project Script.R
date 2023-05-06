@@ -15,7 +15,7 @@ library(reshape2)
 library(psych)
 library(vars)
 library(lmtest)
-
+library(tseries)
 conflict_prefer('select', 'dplyr')
 conflict_prefer('filter', 'dplyr')
 conflict_prefer('lag', 'dplyr')
@@ -70,6 +70,7 @@ df_drivers <- read.csv('C:/Users/alkim/OneDrive/Documents/GitHub/csbtc/current.c
 #########Data Manipulation########
 names(df)[names(df) == 'Vol.'] <- "Vol"
 names(df)[names(df) == 'Change..'] <- "Change"
+names(df)[names(df) == 'X...Date'] <- "Date"
 
 
 df$Price <- as.numeric(sub(",", "", df$Price, fixed=TRUE))
@@ -100,10 +101,9 @@ df_price_quarterly <- df %>% group_by(quarter) %>% summarise(price = exp(mean(lo
 #df_price_quarterly <- df %>% group_by(quarter) %>% summarise(price = mean(Price))
 df_price_quarterly$lag <- lag(df_price_quarterly$price)
 df_price_quarterly$change <- change_func(df_price_quarterly$price, df_price_quarterly$lag)
-df_price_quarterly = df_price_quarterly[-c(52),] #last quarter not finished
 df_price_quarterly$lag <- na.fill(df_price_quarterly$lag, 0)
 df_price_quarterly$change <- na.fill(df_price_quarterly$change, 0)
-df_price_quarterly_without_2023_q1 <- df_price_quarterly[-nrow(df_price_quarterly),]
+df_price_quarterly_without_2023_q2 <- df_price_quarterly[-nrow(df_price_quarterly),]
 
 df_drivers <- df_drivers %>% select(c('sasdate','UNRATE','CPIAUCSL', 'CPILFESL', 'FEDFUNDS', 
                                       'S.P.500', 'S.P..indust', 'S.P.div.yield',
@@ -122,11 +122,11 @@ df_drivers$CPIAUCSL_change <- change_func(df_drivers$CPIAUCSL, df_drivers$CPIAUC
 df_drivers$CPILFESL_lag <- lag(df_drivers$CPILFESL)
 df_drivers$CPILFESL_change <- change_func(df_drivers$CPILFESL, df_drivers$CPILFESL_lag)
 #df_price_quarterly <- df_price_quarterly[-1]
-df_drivers <- cbind(df_drivers,df_price_quarterly_without_2023_q1$quarter)
+df_drivers <- cbind(df_drivers,df_price_quarterly_without_2023_q2$quarter)
 
 
 
-combined_df <- cbind(df_price_quarterly_without_2023_q1,df_drivers[,-c(1,ncol(df_drivers))])
+combined_df <- cbind(df_price_quarterly_without_2023_q2,df_drivers[,-c(1,ncol(df_drivers))])
 #combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
 combined_df <- combined_df[-c(1:11),]
 
@@ -158,8 +158,10 @@ ggplot(combined_df, aes(x = as.yearqtr(combined_df$quarter, format = '%Y Q%q')))
                                by = 1),
                   labels = function(x) format(x, "%Y Q%q"),
                   expand = c(0, 0)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7)) 
 
+adf.test(combined_df$change)
 # combined_df_2017 <- combined_df %>% filter(as.yearqtr(df_price_quarterly_without_2023_q1$quarter, format = '%Y Q%q') >= '2017 Q1')
 # 
 # ggplot(combined_df_2017, aes(x = as.yearqtr(combined_df_2017$quarter, format = '%Y Q%q'))) +
@@ -176,8 +178,8 @@ ggplot(combined_df, aes(x = as.yearqtr(combined_df$quarter, format = '%Y Q%q')))
 #   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7))
 
 #Time series decomposition - Bitcoin
-price_ts <- ts(df_price_quarterly_without_2023_q1[order(combined_df$quarter),]$change, start = c(2010,3), frequency = 4)
-decomp <- decompose(price_ts, type = 'additive')
+price_ts <- ts(combined_df[order(combined_df$quarter),]$change, start = c(2010,3), frequency = 4)
+decomp <- decompose(price_ts, type = 'multiplicative')
 
 df_decomp <- data.frame(
   x = time(price_ts),
@@ -557,9 +559,11 @@ ggplot(forecasts_with_realized_long, aes(x=quarter)) +
 
 
 #task i
-step.model <- step(model_midasK1, direction = "backward", 
-                      trace = TRUE)
-summary(step.model)
+step.model <- step(lm(response~.,data=midas_data1), direction = "backward", trace = TRUE, steps = 1)
+step.model <- step(lm(response~.-X_CPIAUCSL_change_1,data=midas_data1), direction = "backward", trace = TRUE, steps = 1)
+step.model <- step(lm(response~.-X_CPIAUCSL_change_1-X_Fed_Funds_1,data=midas_data1), direction = "backward", trace = TRUE, steps = 1)
+step.model <- step(lm(response~.-X_CPIAUCSL_change_1-X_Fed_Funds_1-X_SP_500_change_1,data=midas_data1), direction = "backward", trace = TRUE, steps = 1)
+
 
 
 forecasts_midas <- list()
@@ -567,7 +571,8 @@ forecasts_midas[1] <- NA
 for (i in 1:(nrow(midas_data1)-1)){
   train_df <- midas_data1[1:i,]
   #midas_model <- lm(response~autoreg_y+X_SP_500_change_1,data=train_df)
-  midas_model <- lm(response~autoreg_y +X_SP_500_change_1,data=train_df)
+  midas_model <- lm(response~autoreg_y + X_SP_500_change_2 + X_Unemp_Rate_2 +
+                      X_CPIAUCSL_change_2 + X_Fed_Funds_2 + X_Unemp_Rate_1 + X_SP_500_change_1,data=train_df)
   forecasts_midas[i+1] <- predict(midas_model,midas_data1[i+1,2:ncol(midas_data1)])
 }
 
@@ -616,6 +621,12 @@ RMSE_midas
 all_forecasts <- cbind((df_price_quarterly %>% select(quarter, change))[-c(1:12),], 
       forecasts_ar,forecasts_var, forecasts_var3,forecasts_midas[-1])
 all_forecasts <- all_forecasts[-c(1:18),]
+colnames(all_forecasts) <- c('quarter', 'change', 'forecasts_ar', 
+                             'forecasts_var1', 'forecasts_var3', 'forecasts_midas')
+RMSE_ar_partk <- mean((all_forecasts$change - all_forecasts$forecasts_ar )**2)**0.5
+RMSE_var1_partk <- mean((all_forecasts$change - all_forecasts$forecasts_var1 )**2)**0.5
+RMSE_var3_partk <- mean((all_forecasts$change - all_forecasts$forecasts_var3 )**2)**0.5
+RMSE_midas_partk <- mean((all_forecasts$change - all_forecasts$forecasts_midas )**2)**0.5
 
 #part l
 var_data_partl <- df_drivers_monthly_selected %>% select(-c(Date,monthnum))
