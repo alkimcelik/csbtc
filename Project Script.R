@@ -128,7 +128,7 @@ df_drivers <- cbind(df_drivers,df_price_quarterly_without_2023_q2$quarter)
 
 combined_df <- cbind(df_price_quarterly_without_2023_q2,df_drivers[,-c(1,ncol(df_drivers))])
 #combined_df$normalized_price <- (combined_df$normalized_price - min(combined_df$normalized_price)) / (max(combined_df$normalized_price) - min(combined_df$normalized_price))
-combined_df <- combined_df[-c(1:11),]
+#combined_df <- combined_df[-c(1:11),]
 
 
 plot(x = as.yearqtr(df_price_quarterly_without_2023_q1$quarter, format = '%Y Q%q'), y = df_price_quarterly_without_2023_q1$price, type = 'l')
@@ -147,7 +147,7 @@ ggplot(df %>% filter(Date >= '2017-01-01'), aes(x = Date, y = Price)) +
   ggtitle('Bitcoin Daily Price between January 2017 to April 2023')
 
 #Bitcoin Growth Rate
-ggplot(combined_df, aes(x = as.yearqtr(combined_df$quarter, format = '%Y Q%q'))) +
+ggplot(combined_df, aes(x = as.yearqtr(quarter, format = '%Y Q%q'))) +
   geom_line(aes(y = change/100),color = 'darkgreen', linewidth = 1) + 
   geom_point(aes(y = change/100),color = 'darkgreen') +
   ylab('Growth Rate') + xlab('Quarters') +
@@ -200,7 +200,7 @@ ggplot(df_comp_long, aes(x = x, y = value)) +
   ggtitle("Bitcoin Growth Additive Time Series Decomposition")
 
 #Bitcoin Growth Acf Plot
-acf_result <- acf(df_decomp$random, na.action = na.pass)
+acf_result <- acf(price_ts, na.action = na.pass, main = 'Bitcoin Growth Rate Autocorrelation Graph')
 
 
 acf_df <- data.frame(lag = acf_result$lag, acf = acf_result$acf)
@@ -213,7 +213,7 @@ ggplot(acf_df, aes(x = lag*4, y = acf)) +
   ggtitle("Bitcoin Growth ACF Plot")  
 
 #Pacf plot
-pacf_result <- pacf(df_decomp$random, na.action = na.pass)
+pacf_result <- pacf(price_ts, na.action = na.pass)
 
 pacf_df <- data.frame(lag = pacf_result$lag, pacf = pacf_result$acf)
 
@@ -249,11 +249,12 @@ ggplot(df_comp_long_sp500, aes(x = x, y = value)) +
 #Other factors plots
 #S&P 500
 ggplot(df_drivers, aes(x=Date)) + 
-  geom_line(aes(y = SP_500),color = 'firebrick', linewidth = 0.8) + 
+  geom_line(aes(y = SP_500_change),color = 'firebrick', linewidth = 0.8) + 
   ylab('Price ($)') + xlab('Quarters') +
-  scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
-               labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
-  ggtitle('Quarterly S&P 500 between 2010 Q3 and 2023 Q1') 
+  scale_x_date(breaks = as.Date(c("2010-12-01", "2014-03-01", '2018-09-01', '2023-03-01')), 
+               labels = c('2010 Q4', '2014 Q1', '2018 Q3', '2023 Q1')) +
+  ggtitle('S&P 500 Quarterly Growth Rate between 2010 Q4 and 2023 Q1') +
+  theme_minimal()
 
 #CPI
 ggplot(melt(data.table(df_drivers %>% select(Date,CPIAUCSL_change,CPILFESL_change)), 
@@ -261,18 +262,19 @@ ggplot(melt(data.table(df_drivers %>% select(Date,CPIAUCSL_change,CPILFESL_chang
   geom_line(aes(y = value/100, color = variable), linewidth = 0.8) + 
   scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00"), labels = c('CPI', 'CPI Core')) + # Add color legend with blue and orange colors
   ylab('Growth Rate') + xlab('Quarters') +
-  scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
-               labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
-  ggtitle('CPI Growth between 2010 Q3 and 2023 Q1') +
-  scale_y_continuous(labels = scales::percent_format())
+  scale_x_date(breaks = as.Date(c("2010-12-01", "2014-03-01", '2018-09-01', '2023-03-01')), 
+               labels = c('2010 Q4', '2014 Q1', '2018 Q3', '2023 Q1')) +
+  ggtitle('CPI Growth between 2010 Q4 and 2023 Q1') +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme_minimal()
 
 #Federal Funds Rate
 ggplot(df_drivers, aes(x=Date)) + 
   geom_line(aes(y = Fed_Funds/100),color = 'chocolate4', linewidth = 0.8) + 
   theme_minimal() + ylab('Federal Funds Rate') + xlab('Quarters') +
   scale_y_continuous(labels = percent_format()) +
-  scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
-               labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
+  scale_x_date(breaks = as.Date(c("2010-12-01", "2014-06-01", '2018-12-01', '2023-03-01')), 
+               labels = c('2010 Q4', '2014 Q2', '2018 Q4', '2023 Q1')) +
   ggtitle('Quarterly Federal Funds Rates between 2010 Q3 and 2023 Q1') 
 
 
