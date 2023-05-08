@@ -262,8 +262,8 @@ ggplot(melt(data.table(df_drivers %>% select(Date,CPIAUCSL_change,CPILFESL_chang
   geom_line(aes(y = value/100, color = variable), linewidth = 0.8) + 
   scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00"), labels = c('CPI', 'CPI Core')) + # Add color legend with blue and orange colors
   ylab('Growth Rate') + xlab('Quarters') +
-  scale_x_date(breaks = as.Date(c("2010-12-01", "2014-03-01", '2018-09-01', '2023-03-01')), 
-               labels = c('2010 Q4', '2014 Q1', '2018 Q3', '2023 Q1')) +
+  scale_x_date(breaks = as.Date(c("2010-12-01", "2014-06-01", '2018-12-01', '2023-03-01')), 
+               labels = c('2010 Q4', '2014 Q2', '2018 Q4', '2023 Q1')) +
   ggtitle('CPI Growth between 2010 Q4 and 2023 Q1') +
   scale_y_continuous(labels = scales::percent_format()) +
   theme_minimal()
@@ -275,7 +275,7 @@ ggplot(df_drivers, aes(x=Date)) +
   scale_y_continuous(labels = percent_format()) +
   scale_x_date(breaks = as.Date(c("2010-12-01", "2014-06-01", '2018-12-01', '2023-03-01')), 
                labels = c('2010 Q4', '2014 Q2', '2018 Q4', '2023 Q1')) +
-  ggtitle('Quarterly Federal Funds Rates between 2010 Q3 and 2023 Q1') 
+  ggtitle('Quarterly Federal Funds Rates between 2010 Q4 and 2023 Q1') 
 
 
 #SP 500 Change
@@ -283,18 +283,18 @@ ggplot(df_drivers, aes(x=Date)) +
   geom_line(aes(y = SP_500_change/100),color = 'firebrick', linewidth = 0.8) + 
   theme_minimal() + ylab('Change') + xlab('Quarters') +
   scale_y_continuous(labels = percent_format()) +
-  scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
-               labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
-  ggtitle('S&P 500 Quarterly Change between 2010 Q3 and 2023 Q1') 
+  scale_x_date(breaks = as.Date(c("2010-12-01", "2014-06-01", '2018-12-01', '2023-03-01')), 
+               labels = c('2010 Q4', '2014 Q2', '2018 Q4', '2023 Q1')) +
+  ggtitle('S&P 500 Quarterly Change between 2010 Q4 and 2023 Q1') 
 
 #Unemployment
 ggplot(df_drivers, aes(x=Date)) + 
   geom_line(aes(y = Unemp_Rate/100),color = 'dodgerblue3', linewidth = 0.8) + 
   theme_minimal() + ylab('Unemployment Rate') + xlab('Quarters') +
   scale_y_continuous(labels = percent_format()) +
-  scale_x_date(breaks = as.Date(c("2010-06-01", "2014-03-01", '2018-09-01', '2022-12-01')), 
-               labels = c('2010 Q3', '2014 Q2', '2018 Q4', '2023 Q1')) +
-  ggtitle('Unemployment Rate between 2010 Q3 and 2023 Q1') 
+  scale_x_date(breaks = as.Date(c("2010-12-01", "2014-06-01", '2018-12-01', '2023-03-01')), 
+               labels = c('2010 Q4', '2014 Q2', '2018 Q4', '2023 Q1')) +
+  ggtitle('Unemployment Rate between 2010 Q4 and 2023 Q1') 
 
 #Lag correlation
 bit_ts = df %>%
@@ -334,12 +334,12 @@ ggplot(data = correlation, aes(x = Var2, y = Var1, fill = value)) +
 
 #part_C  
 #Growth ratelerde stationarity testi yapip stationary hale getirecek miyiz
-ts_data <- ts(combined_df$change, start = c(2013,2), frequency = 4)
+ts_data <- ts(combined_df$change, start = c(2013,3), frequency = 4)
 forecasts_ar <- list()
 forecasts_ar[1:2] <- NA
 for (i in 2:(length(ts_data)-1)){
   train_df <- ts_data[1:i]
-  ar1_model <- ar(train_df, order = 1)
+  ar1_model <- ar(train_df, order = 1, method = 'ols')
   forecasts_ar[i+1] <- forecast(ar1_model,h=1)$mean
 }
 
