@@ -255,7 +255,7 @@ ggplot(df_drivers, aes(x=Date)) +
   ylab('Price ($)') + xlab('Quarters') +
   scale_x_date(breaks = as.Date(c("2010-12-01", "2014-03-01", '2018-09-01', '2023-03-01')), 
                labels = c('2010 Q4', '2014 Q1', '2018 Q3', '2023 Q1')) +
-  ggtitle('S&P 500 Quarterly Growth Rate between 2010 Q4 and 2023 Q1') +
+  #ggtitle('S&P 500 Quarterly Growth Rate between 2010 Q4 and 2023 Q1') +
   theme_minimal()
 
 #CPI
@@ -266,8 +266,9 @@ ggplot(melt(data.table(df_drivers %>% select(Date,CPIAUCSL_change,CPILFESL_chang
   ylab('Growth Rate') + xlab('Quarters') +
   scale_x_date(breaks = as.Date(c("2010-12-01", "2014-06-01", '2018-12-01', '2023-03-01')), 
                labels = c('2010 Q4', '2014 Q2', '2018 Q4', '2023 Q1')) +
-  ggtitle('CPI Growth between 2010 Q4 and 2023 Q1') +
+  #ggtitle('CPI Growth between 2010 Q4 and 2023 Q1') +
   scale_y_continuous(labels = scales::percent_format()) +
+  theme(axis.text = element_text(size = 10)) +
   theme_minimal()
 
 #Federal Funds Rate
@@ -277,7 +278,8 @@ ggplot(df_drivers, aes(x=Date)) +
   scale_y_continuous(labels = percent_format()) +
   scale_x_date(breaks = as.Date(c("2010-12-01", "2014-06-01", '2018-12-01', '2023-03-01')), 
                labels = c('2010 Q4', '2014 Q2', '2018 Q4', '2023 Q1')) +
-  ggtitle('Quarterly Federal Funds Rates between 2010 Q4 and 2023 Q1') 
+  theme(axis.text = element_text(size = 10))
+  #ggtitle('Quarterly Federal Funds Rates between 2010 Q4 and 2023 Q1') 
 
 
 #SP 500 Change
@@ -287,7 +289,8 @@ ggplot(df_drivers, aes(x=Date)) +
   scale_y_continuous(labels = percent_format()) +
   scale_x_date(breaks = as.Date(c("2010-12-01", "2014-06-01", '2018-12-01', '2023-03-01')), 
                labels = c('2010 Q4', '2014 Q2', '2018 Q4', '2023 Q1')) +
-  ggtitle('S&P 500 Quarterly Change between 2010 Q4 and 2023 Q1') 
+  theme(axis.text = element_text(size = 10))
+#ggtitle('S&P 500 Quarterly Change between 2010 Q4 and 2023 Q1') 
 
 #Unemployment
 ggplot(df_drivers, aes(x=Date)) + 
@@ -295,8 +298,9 @@ ggplot(df_drivers, aes(x=Date)) +
   theme_minimal() + ylab('Unemployment Rate') + xlab('Quarters') +
   scale_y_continuous(labels = percent_format()) +
   scale_x_date(breaks = as.Date(c("2010-12-01", "2014-06-01", '2018-12-01', '2023-03-01')), 
-               labels = c('2010 Q4', '2014 Q2', '2018 Q4', '2023 Q1')) +
-  ggtitle('Unemployment Rate between 2010 Q4 and 2023 Q1') 
+               labels = c('2010 Q4', '2014 Q2', '2018 Q4', '2023 Q1'))+
+  theme(axis.text = element_text(size = 10))
+#ggtitle('Unemployment Rate between 2010 Q4 and 2023 Q1') 
 
 #Lag correlation
 bit_ts = df %>%
@@ -360,8 +364,9 @@ ggplot(forecasts_with_realized_long, aes(x=quarter)) +
                                by = 3),
                   labels = function(x) format(x, "%Y Q%q"),
                   expand = c(0, 0)) +
-  ggtitle('Actual vs. Forecasted Growth Rate in AR(1) Model') +
-  scale_y_continuous(labels = scales::percent_format())
+  #ggtitle('Actual vs. Forecasted Growth Rate in AR(1) Model') +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme_minimal()
 
 forecasts_with_realized_extracted_ar <- forecasts_with_realized[-c(1:2),]
 RMSE_AR <- mean((forecasts_with_realized_extracted_ar$change - forecasts_with_realized_extracted_ar$forecasts_ar)**2)**0.5
@@ -385,7 +390,7 @@ forecasts_with_realized_with_var_long$quarter <- as.yearqtr(forecasts_with_reali
 
 ggplot(forecasts_with_realized_with_var_long, aes(x=quarter)) + 
   geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
-  geom_point(aes(y = value/100, color = variable)) + 
+  #geom_point(aes(y = value/100, color = variable)) + 
   scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00", "red"), labels = c('Actual', 'AR Forecasted', 'VAR Forecasted')) + # Add color legend with blue and orange colors
   ylab('Growth Rate') + xlab('Quarters') +
   scale_x_yearqtr(breaks = seq(min(as.yearqtr(forecasts_with_realized_with_var_long$quarter)), 
@@ -393,11 +398,13 @@ ggplot(forecasts_with_realized_with_var_long, aes(x=quarter)) +
                                by = 3),
                   labels = function(x) format(x, "%Y Q%q"),
                   expand = c(0, 0)) +
-  ggtitle('Actual vs. Forecasted Growth Rates in AR(1) and VAR(1) Model') +
-  scale_y_continuous(labels = scales::percent_format())
+  #ggtitle('Actual vs. Forecasted Growth Rates in AR(1) and VAR(1) Model') +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme_minimal()
 
 forecasts_with_realized_with_var_extracted <- forecasts_with_realized_with_var[-c(1:7),]
 RMSE_AR_VAR <- mean((forecasts_with_realized_with_var_extracted$change - forecasts_with_realized_with_var_extracted$forecasts_var)**2)**0.5
+RMSE_AR_VAR_AR <- mean((forecasts_with_realized_with_var_extracted$change - forecasts_with_realized_with_var_extracted$forecasts_ar)**2)**0.5
 
 #part e
 grangertest(change ~ Unemp_Rate , order = 1, data = var_data)
@@ -440,11 +447,14 @@ ggplot(forecasts_with_realized_with_var_3_long, aes(x=quarter)) +
                                by = 3),
                   labels = function(x) format(x, "%Y Q%q"),
                   expand = c(0, 0)) +
-  ggtitle('Actual vs. Forecasted Growth Rates in AR(1), VAR(1), and VAR(3) Models') +
-  scale_y_continuous(labels = scales::percent_format())
+  #ggtitle('Actual vs. Forecasted Growth Rates in AR(1), VAR(1), and VAR(3) Models') +
+  scale_y_continuous(labels = scales::percent_format())+
+  theme_minimal()
 
 forecasts_with_realized_with_var_3_extracted <- forecasts_with_realized_with_var_3[-c(1:19),]
 RMSE_VAR3 <- mean((forecasts_with_realized_with_var_3_extracted$change - forecasts_with_realized_with_var_3_extracted$forecasts_var3)**2)**0.5
+RMSE_VAR1 <- mean((forecasts_with_realized_with_var_3_extracted$change - forecasts_with_realized_with_var_3_extracted$forecasts_var)**2)**0.5
+RMSE_AR1 <- mean((forecasts_with_realized_with_var_3_extracted$change - forecasts_with_realized_with_var_3_extracted$forecasts_ar)**2)**0.5
 
 
 
@@ -573,18 +583,23 @@ summary(step.model)
 
 forecasts_midas <- list()
 forecasts_midas[1] <- NA
+forecasts_umidas <- list()
+forecasts_umidas[1] <- NA
 for (i in 1:(nrow(midas_data1)-1)){
   train_df <- midas_data1[1:i,]
   #midas_model <- lm(response~autoreg_y+X_SP_500_change_1,data=train_df)
   midas_model <- lm(response~autoreg_y + X_SP_500_change_2 + X_Unemp_Rate_2 +
                       X_CPIAUCSL_change_2 + X_Fed_Funds_2 ,data=train_df)
+  umidas_model <- lm(response~. ,data=train_df)
   forecasts_midas[i+1] <- predict(midas_model,midas_data1[i+1,2:ncol(midas_data1)])
+  forecasts_umidas[i+1] <- predict(umidas_model,midas_data1[i+1,2:ncol(midas_data1)])
 }
 
 forecasts_midas <- unlist(forecasts_midas)
+forecasts_umidas <- unlist(forecasts_umidas)
 
 
-forecasts_with_realized_midas <- cbind(combined_df %>% select(quarter, change), forecasts_midas)
+forecasts_with_realized_midas <- cbind(combined_df %>% select(quarter, change),forecasts_umidas, forecasts_midas)
 forecasts_with_realized_midas_long <- melt(forecasts_with_realized_midas, 
                                      id.vars = c('quarter'))
 forecasts_with_realized_midas_long$quarter <- as.yearqtr(forecasts_with_realized_midas_long$quarter, format = "%Y Q%q")
@@ -592,15 +607,15 @@ forecasts_with_realized_midas_long$quarter <- as.yearqtr(forecasts_with_realized
 ggplot(forecasts_with_realized_midas_long, aes(x=quarter)) + 
   geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
   geom_point(aes(y = value/100, color = variable)) + 
-  scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00"), labels = c('Actual', 'Forecasted')) + # Add color legend with blue and orange colors
+  scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00", "olivedrab4"), labels = c('Actual', 'Full U-MIDAS', 'Reduced U-MIDAS')) + # Add color legend with blue and orange colors
   ylab('Growth Rate') + xlab('Quarters') +
   scale_x_yearqtr(breaks = seq(min(as.yearqtr(forecasts_with_realized_midas_long$quarter)), 
                                max(as.yearqtr(forecasts_with_realized_midas_long$quarter)), 
                                by = 3),
                   labels = function(x) format(x, "%Y Q%q"),
                   expand = c(0, 0)) +
-  ggtitle('Actual vs. Forecasted Growth Rate in AR(1) Model') +
-  scale_y_continuous(labels = scales::percent_format())
+  #ggtitle('Actual vs. Forecasted Growth Rate in AR(1) Model') +
+  scale_y_continuous(labels = scales::percent_format())+theme_minimal()
 
 
 
@@ -632,7 +647,7 @@ colnames(all_forecasts) <- c('quarter', 'change', 'forecasts_ar',
 RMSE_ar_partk <- mean((all_forecasts$change - all_forecasts$forecasts_ar )**2)**0.5
 RMSE_var1_partk <- mean((all_forecasts$change - all_forecasts$forecasts_var1 )**2)**0.5
 RMSE_var3_partk <- mean((all_forecasts$change - all_forecasts$forecasts_var3 )**2)**0.5
-RMSE_midas_partk <- mean((all_forecasts$change - all_forecasts$RMSE_midas_reduced )**2)**0.5
+RMSE_midas_partk <- mean((all_forecasts$change - all_forecasts$forecasts_midas )**2)**0.5
 
 #part l
 var_data_partl <- df_drivers_monthly_selected %>% filter(Date >= '2010-08-01')  %>% select(-c(Date, monthnum)) 
