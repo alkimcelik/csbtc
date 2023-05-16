@@ -133,7 +133,6 @@ combined_df <- cbind(df_price_quarterly_without_2023_q2,df_drivers[,-c(1,ncol(df
 #combined_df <- combined_df[-c(1:11),]
 
 
-plot(x = as.yearqtr(df_price_quarterly_without_2023_q1$quarter, format = '%Y Q%q'), y = df_price_quarterly_without_2023_q1$price, type = 'l')
 
 #######PLOTTING#######
 plot.new()
@@ -320,7 +319,7 @@ gglagplot(bit_ts, do.lines = F) + my_theme +
   ggtitle('Correlation Graph of the Bitcoin Price')
 
 # Correlation heatmap
-correlation <- round(cor(combined_df[,c(4,5,8,16,18)], use = "complete.obs"),2)
+correlation <- round(cor(combined_df[,c(4,5,8,16,18)], use = "complete.obs", method = 'pearson'),2)
 correlation[upper.tri(correlation)] <- NA
 correlation <- na.omit(reshape2::melt(correlation))
 
@@ -333,8 +332,8 @@ ggplot(data = correlation, aes(x = Var2, y = Var1, fill = value)) +
   scale_y_discrete(expand = c(0,0)) + # remove gray areas in y-axis
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        panel.background = element_blank()) +
-  ggtitle('Correlation Heatmap')
+        panel.background = element_blank()) 
+  #ggtitle('Correlation Heatmap')
 
 
 
@@ -636,11 +635,27 @@ ggplot(forecasts_with_realized_midas_long, aes(x=quarter)) +
 #RMSE
 forecasts_with_realized_midas <- forecasts_with_realized_midas[-1,]
 RMSE_midas_reduced <- mean((forecasts_with_realized_midas$change - forecasts_with_realized_midas$forecasts_midas)**2)**0.5
+RMSE_midas_full <- mean((forecasts_with_realized_midas$change - forecasts_with_realized_midas$forecasts_umidas)**2)**0.5
 RMSE_midas_reduced
+RMSE_midas_full
 
 #part k
 all_forecasts <- cbind((combined_df %>% select(quarter, change)), 
-      forecasts_ar,forecasts_var, forecasts_var3,forecasts_midas)
+      forecasts_ar,forecasts_var, forecasts_var3 ,forecasts_midas)
+all_forecasts_long <- melt(all_forecasts, id.vars = c('quarter'))
+all_forecasts_long$quarter <- as.yearqtr(all_forecasts_long$quarter, format = "%Y Q%q")
+ggplot(all_forecasts_long, aes(x=quarter)) + 
+  geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
+  #geom_point(aes(y = value/100, color = variable)) + 
+  scale_color_manual(name = '' ,values = c("#1f77b4", "#2ca02c", "#d62728", '#ff7f0e', '#9467bd'), labels = c('Actual', 'AR(1)', 'VAR(1)', 'VAR(3)', 'U-MIDAS')) + # Add color legend with blue and orange colors
+  ylab('Growth Rate') + xlab('Quarters') +
+  scale_x_yearqtr(breaks = seq(min(as.yearqtr(forecasts_with_realized_midas_long$quarter)), 
+                               max(as.yearqtr(forecasts_with_realized_midas_long$quarter)), 
+                               by = 3),
+                  labels = function(x) format(x, "%Y Q%q"),
+                  expand = c(0, 0)) +
+  #ggtitle('Actual vs. Forecasted Growth Rate in AR(1) Model') +
+  scale_y_continuous(labels = scales::percent_format())+theme_minimal()
 all_forecasts <- all_forecasts[-c(1:19),]
 colnames(all_forecasts) <- c('quarter', 'change', 'forecasts_ar', 
                              'forecasts_var1', 'forecasts_var3', 'forecasts_midas')
@@ -694,10 +709,11 @@ forecasts_compr_long$month <-as.Date(as.yearmon(forecasts_compr_long$month))
 ggplot(forecasts_compr_long, aes(x=month)) + 
   geom_line(aes(y = value/100, color = variable), linewidth = 0.5) + 
   #geom_point(aes(y = value/100, color = variable)) + 
-  scale_color_manual(name = '' ,values = c("#0072B2", "#D55E00", "red", 'darkgreen'), labels = c('Actual', 'AR(1)', 'VAR(1)','VAR(6)')) + # Add color legend with blue and orange colors
+  scale_color_manual(name = '' ,values = c("#1f77b4", "#2ca02c", "#d62728", '#ff7f0e'), labels = c('Actual', 'AR(1)', 'VAR(1)','VAR(6)')) + # Add color legend with blue and orange colors
   ylab('Growth Rate') + xlab('Month') +
-  ggtitle('Actual vs. Forecasted Growth Rates in AR(1), VAR(1), and VAR(6) Models') +
-  scale_y_continuous(labels = scales::percent_format())
+  #ggtitle('Actual vs. Forecasted Growth Rates in AR(1), VAR(1), and VAR(6) Models') +
+  scale_y_continuous(labels = scales::percent_format())+
+  theme_minimal()
 
 forecasts_compr_extracted <- forecasts_compr[-c(1:37),]
 RMSE_ar_partl <- mean((forecasts_compr_extracted$change - forecasts_compr_extracted$forecasts_ar_partl)**2)**0.5
